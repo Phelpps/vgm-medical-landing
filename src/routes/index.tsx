@@ -97,7 +97,7 @@ function Index() {
 function Header() {
   const [open, setOpen] = useState(false);
   const links = [
-    { href: "#catalogo", label: "Catálogo" },
+    { href: "/catalogo", label: "Catálogo", route: true as const },
     { href: "#sobre", label: "Sobre" },
     { href: "#contato", label: "Contato" },
   ];
