@@ -488,7 +488,7 @@ function Footer() {
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-foreground">Navegação</div>
           <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-            <li><a href="#catalogo" className="hover:text-primary">Catálogo</a></li>
+            <li><Link to="/catalogo" className="hover:text-primary">Catálogo</Link></li>
             <li><a href="#sobre" className="hover:text-primary">Sobre nós</a></li>
             <li><a href="#contato" className="hover:text-primary">Contato</a></li>
           </ul>
