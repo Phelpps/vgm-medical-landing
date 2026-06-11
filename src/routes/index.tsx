@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Phone,
@@ -97,7 +97,7 @@ function Index() {
 function Header() {
   const [open, setOpen] = useState(false);
   const links = [
-    { href: "#catalogo", label: "Catálogo" },
+    { href: "/catalogo", label: "Catálogo", route: true as const },
     { href: "#sobre", label: "Sobre" },
     { href: "#contato", label: "Contato" },
   ];
@@ -114,11 +114,17 @@ function Header() {
           </div>
         </a>
         <nav className="hidden items-center gap-8 md:flex">
-          {links.map((l) => (
-            <a key={l.href} href={l.href} className="text-sm font-medium text-muted-foreground transition hover:text-primary">
-              {l.label}
-            </a>
-          ))}
+          {links.map((l) =>
+            "route" in l ? (
+              <Link key={l.href} to={l.href} className="text-sm font-medium text-muted-foreground transition hover:text-primary">
+                {l.label}
+              </Link>
+            ) : (
+              <a key={l.href} href={l.href} className="text-sm font-medium text-muted-foreground transition hover:text-primary">
+                {l.label}
+              </a>
+            ),
+          )}
           <a
             href={whatsappLink("Olá! Vim pelo site da VGM Medical e gostaria de mais informações.")}
             target="_blank"
@@ -143,11 +149,17 @@ function Header() {
       {open && (
         <div className="border-t border-border bg-background md:hidden">
           <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3">
-            {links.map((l) => (
-              <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary">
-                {l.label}
-              </a>
-            ))}
+            {links.map((l) =>
+              "route" in l ? (
+                <Link key={l.href} to={l.href} onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary">
+                  {l.label}
+                </Link>
+              ) : (
+                <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary">
+                  {l.label}
+                </a>
+              ),
+            )}
             <a
               href={whatsappLink("Olá! Vim pelo site da VGM Medical.")}
               target="_blank"
@@ -190,12 +202,12 @@ function Hero() {
             >
               Solicitar orçamento <ArrowRight className="h-4 w-4" />
             </a>
-            <a
-              href="#catalogo"
+            <Link
+              to="/catalogo"
               className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white/80 px-7 py-3.5 text-sm font-semibold text-foreground backdrop-blur transition hover:bg-white"
             >
               Ver catálogo
-            </a>
+            </Link>
           </div>
           <div className="mt-8 flex flex-wrap gap-6 text-sm text-muted-foreground">
             {["Aço inoxidável", "Entrega para todo Brasil", "Atendimento humano"].map((t) => (
@@ -476,7 +488,7 @@ function Footer() {
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-foreground">Navegação</div>
           <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-            <li><a href="#catalogo" className="hover:text-primary">Catálogo</a></li>
+            <li><Link to="/catalogo" className="hover:text-primary">Catálogo</Link></li>
             <li><a href="#sobre" className="hover:text-primary">Sobre nós</a></li>
             <li><a href="#contato" className="hover:text-primary">Contato</a></li>
           </ul>
