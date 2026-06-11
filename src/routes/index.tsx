@@ -21,8 +21,8 @@ import f4 from "@/assets/forceps-4.jpg";
 import f5 from "@/assets/forceps-5.jpg";
 import f6 from "@/assets/forceps-6.jpg";
 
-const WHATSAPP_NUMBER = "5562000000000";
-const PHONE_DISPLAY = "(62) 0000-0000";
+const WHATSAPP_NUMBER = "556298341044";
+const PHONE_DISPLAY = "(62) 9834-1044";
 const ADDRESS = "Goiânia, Goiás — Brasil";
 
 export const Route = createFileRoute("/")({
