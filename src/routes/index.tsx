@@ -114,11 +114,17 @@ function Header() {
           </div>
         </a>
         <nav className="hidden items-center gap-8 md:flex">
-          {links.map((l) => (
-            <a key={l.href} href={l.href} className="text-sm font-medium text-muted-foreground transition hover:text-primary">
-              {l.label}
-            </a>
-          ))}
+          {links.map((l) =>
+            "route" in l ? (
+              <Link key={l.href} to={l.href} className="text-sm font-medium text-muted-foreground transition hover:text-primary">
+                {l.label}
+              </Link>
+            ) : (
+              <a key={l.href} href={l.href} className="text-sm font-medium text-muted-foreground transition hover:text-primary">
+                {l.label}
+              </a>
+            ),
+          )}
           <a
             href={whatsappLink("Olá! Vim pelo site da VGM Medical e gostaria de mais informações.")}
             target="_blank"
