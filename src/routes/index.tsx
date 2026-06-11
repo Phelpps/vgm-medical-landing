@@ -202,12 +202,12 @@ function Hero() {
             >
               Solicitar orçamento <ArrowRight className="h-4 w-4" />
             </a>
-            <a
-              href="#catalogo"
+            <Link
+              to="/catalogo"
               className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white/80 px-7 py-3.5 text-sm font-semibold text-foreground backdrop-blur transition hover:bg-white"
             >
               Ver catálogo
-            </a>
+            </Link>
           </div>
           <div className="mt-8 flex flex-wrap gap-6 text-sm text-muted-foreground">
             {["Aço inoxidável", "Entrega para todo Brasil", "Atendimento humano"].map((t) => (
