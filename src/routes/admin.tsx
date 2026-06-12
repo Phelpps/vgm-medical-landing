@@ -349,7 +349,7 @@ function ProductForm({
           <Save className="h-4 w-4" /> {saving ? "Salvando…" : "Salvar"}
         </button>
       </div>
-      <style>{`.input{width:100%;border:1px solid hsl(var(--border));background:hsl(var(--background));border-radius:0.5rem;padding:0.5rem 0.75rem;font-size:0.875rem;outline:none}.input:focus{border-color:hsl(var(--primary));box-shadow:0 0 0 2px hsl(var(--primary)/0.2)}`}</style>
+      
     </div>
   );
 }
