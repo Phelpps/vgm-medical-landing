@@ -295,7 +295,7 @@ function ProductForm({
           <input
             value={draft.name}
             onChange={(e) => onChange({ ...draft, name: e.target.value })}
-            className="input"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </Field>
         <Field label="Categoria">
@@ -303,7 +303,7 @@ function ProductForm({
             value={draft.category}
             onChange={(e) => onChange({ ...draft, category: e.target.value })}
             placeholder="Ex.: Pinças Anatômicas"
-            className="input"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </Field>
         <Field label="Descrição" full>
@@ -311,7 +311,7 @@ function ProductForm({
             value={draft.description}
             onChange={(e) => onChange({ ...draft, description: e.target.value })}
             rows={2}
-            className="input"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </Field>
         <Field label="Ordem (menor aparece primeiro)">
@@ -319,7 +319,7 @@ function ProductForm({
             type="number"
             value={draft.sort_order}
             onChange={(e) => onChange({ ...draft, sort_order: Number(e.target.value) || 0 })}
-            className="input"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </Field>
         <Field label="Imagem">
