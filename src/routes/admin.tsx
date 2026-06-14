@@ -189,10 +189,17 @@ function AdminPage() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setShowNewUser(true)}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold hover:bg-secondary"
+              title="Cadastrar novo administrador"
+            >
+              <UserPlus className="h-4 w-4" /> <span className="hidden sm:inline">Novo admin</span>
+            </button>
+            <button
               onClick={() => setDraft({ ...EMPTY })}
               className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:opacity-90"
             >
-              <Plus className="h-4 w-4" /> Novo produto
+              <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Novo produto</span>
             </button>
             <button
               onClick={handleSignOut}
