@@ -381,3 +381,80 @@ function Field({ label, children, full }: { label: string; children: React.React
     </div>
   );
 }
+
+function NewAdminForm({
+  onClose,
+  onCreate,
+}: {
+  onClose: () => void;
+  onCreate: (email: string, password: string) => Promise<void>;
+}) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [ok, setOk] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setErr(null);
+    setOk(null);
+    setBusy(true);
+    try {
+      await onCreate(email.trim(), password);
+      setOk(`Administrador "${email}" criado com sucesso.`);
+      setEmail("");
+      setPassword("");
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Erro ao criar usuário.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mb-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-base font-bold">Cadastrar novo administrador</h2>
+        <button onClick={onClose} className="rounded-md p-2 text-muted-foreground hover:bg-secondary">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+      <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
+        <Field label="E-mail">
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+        </Field>
+        <Field label="Senha (mínimo 6 caracteres)">
+          <input
+            type="text"
+            required
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+        </Field>
+        {err && <p className="sm:col-span-2 text-sm text-destructive">{err}</p>}
+        {ok && <p className="sm:col-span-2 text-sm text-primary">{ok}</p>}
+        <div className="sm:col-span-2 flex justify-end gap-2">
+          <button type="button" onClick={onClose} className="rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold hover:bg-secondary">
+            Fechar
+          </button>
+          <button
+            type="submit"
+            disabled={busy || !email || password.length < 6}
+            className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-5 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:opacity-90 disabled:opacity-50"
+          >
+            {busy ? "Criando…" : "Criar administrador"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
