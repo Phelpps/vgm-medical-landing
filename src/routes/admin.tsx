@@ -1,8 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, LogOut, Plus, Pencil, Trash2, Save, X, Upload, ImageOff } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowLeft, LogOut, Plus, Pencil, Trash2, Save, X, Upload, ImageOff, UserPlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { createAdminUser } from "@/lib/admin-users.functions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — VGM Medical" }, { name: "robots", content: "noindex" }] }),
@@ -37,6 +39,8 @@ function AdminPage() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [signedThumbs, setSignedThumbs] = useState<Record<string, string>>({});
+  const [showNewUser, setShowNewUser] = useState(false);
+  const createUser = useServerFn(createAdminUser);
 
   useEffect(() => {
     let mounted = true;
