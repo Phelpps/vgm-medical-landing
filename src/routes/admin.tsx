@@ -1,8 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, LogOut, Plus, Pencil, Trash2, Save, X, Upload, ImageOff } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowLeft, LogOut, Plus, Pencil, Trash2, Save, X, Upload, ImageOff, UserPlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { createAdminUser } from "@/lib/admin-users.functions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — VGM Medical" }, { name: "robots", content: "noindex" }] }),
@@ -37,6 +39,8 @@ function AdminPage() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [signedThumbs, setSignedThumbs] = useState<Record<string, string>>({});
+  const [showNewUser, setShowNewUser] = useState(false);
+  const createUser = useServerFn(createAdminUser);
 
   useEffect(() => {
     let mounted = true;
@@ -185,10 +189,17 @@ function AdminPage() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setShowNewUser(true)}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold hover:bg-secondary"
+              title="Cadastrar novo administrador"
+            >
+              <UserPlus className="h-4 w-4" /> <span className="hidden sm:inline">Novo admin</span>
+            </button>
+            <button
               onClick={() => setDraft({ ...EMPTY })}
               className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:opacity-90"
             >
-              <Plus className="h-4 w-4" /> Novo produto
+              <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Novo produto</span>
             </button>
             <button
               onClick={handleSignOut}
@@ -201,6 +212,14 @@ function AdminPage() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        {showNewUser && (
+          <NewAdminForm
+            onClose={() => setShowNewUser(false)}
+            onCreate={async (email, password) => {
+              await createUser({ data: { email, password } });
+            }}
+          />
+        )}
         {draft && (
           <ProductForm
             draft={draft}
@@ -359,6 +378,83 @@ function Field({ label, children, full }: { label: string; children: React.React
     <div className={full ? "sm:col-span-2" : ""}>
       <label className="text-xs font-semibold text-foreground">{label}</label>
       <div className="mt-1">{children}</div>
+    </div>
+  );
+}
+
+function NewAdminForm({
+  onClose,
+  onCreate,
+}: {
+  onClose: () => void;
+  onCreate: (email: string, password: string) => Promise<void>;
+}) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [ok, setOk] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setErr(null);
+    setOk(null);
+    setBusy(true);
+    try {
+      await onCreate(email.trim(), password);
+      setOk(`Administrador "${email}" criado com sucesso.`);
+      setEmail("");
+      setPassword("");
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Erro ao criar usuário.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mb-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-base font-bold">Cadastrar novo administrador</h2>
+        <button onClick={onClose} className="rounded-md p-2 text-muted-foreground hover:bg-secondary">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+      <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
+        <Field label="E-mail">
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+        </Field>
+        <Field label="Senha (mínimo 6 caracteres)">
+          <input
+            type="text"
+            required
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+        </Field>
+        {err && <p className="sm:col-span-2 text-sm text-destructive">{err}</p>}
+        {ok && <p className="sm:col-span-2 text-sm text-primary">{ok}</p>}
+        <div className="sm:col-span-2 flex justify-end gap-2">
+          <button type="button" onClick={onClose} className="rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold hover:bg-secondary">
+            Fechar
+          </button>
+          <button
+            type="submit"
+            disabled={busy || !email || password.length < 6}
+            className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-5 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:opacity-90 disabled:opacity-50"
+          >
+            {busy ? "Criando…" : "Criar administrador"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
