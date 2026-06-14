@@ -212,6 +212,14 @@ function AdminPage() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        {showNewUser && (
+          <NewAdminForm
+            onClose={() => setShowNewUser(false)}
+            onCreate={async (email, password) => {
+              await createUser({ data: { email, password } });
+            }}
+          />
+        )}
         {draft && (
           <ProductForm
             draft={draft}
