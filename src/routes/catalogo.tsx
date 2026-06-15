@@ -190,12 +190,26 @@ function CatalogPage() {
               <div className="text-[11px] text-muted-foreground">Goiânia · GO</div>
             </div>
           </Link>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold transition hover:bg-secondary"
-          >
-            <ArrowLeft className="h-4 w-4" /> Início
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/carrinho"
+              className="relative inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold transition hover:bg-secondary"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              <span className="hidden sm:inline">Carrinho</span>
+              {totalCount > 0 && (
+                <span className="grid h-5 min-w-[20px] place-items-center rounded-full bg-primary px-1 text-[11px] font-bold text-primary-foreground">
+                  {totalCount}
+                </span>
+              )}
+            </Link>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold transition hover:bg-secondary"
+            >
+              <ArrowLeft className="h-4 w-4" /> Início
+            </Link>
+          </div>
         </div>
       </header>
 
