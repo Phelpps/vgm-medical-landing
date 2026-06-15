@@ -432,7 +432,8 @@ function NewAdminForm({
         </Field>
         <Field label="Senha (mínimo 6 caracteres)">
           <input
-            type="text"
+            type="password"
+            autoComplete="new-password"
             required
             minLength={6}
             value={password}

@@ -1,16 +1,22 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const BOOTSTRAP_EMAIL = "phelippecorreia@gmail.com";
-const BOOTSTRAP_PASSWORD = "Ph123963741*";
-
 /**
- * Idempotent bootstrap: if there are zero admins, create the configured
- * primary administrator. Safe to call repeatedly — it becomes a no-op as
- * soon as an admin exists.
+ * Idempotent bootstrap: if there are zero admins AND the
+ * BOOTSTRAP_ADMIN_EMAIL / BOOTSTRAP_ADMIN_PASSWORD server secrets are set,
+ * create the configured primary administrator. Safe to call repeatedly —
+ * becomes a no-op as soon as an admin exists or when the secrets are absent.
+ *
+ * Credentials MUST come from server-side secrets — never hardcode them.
  */
 export const bootstrapInitialAdmin = createServerFn({ method: "POST" }).handler(
   async () => {
+    const email = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim().toLowerCase();
+    const password = process.env.BOOTSTRAP_ADMIN_PASSWORD;
+    if (!email || !password) {
+      return { created: false, reason: "bootstrap-secrets-missing" as const };
+    }
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { count, error: countErr } = await supabaseAdmin
@@ -18,7 +24,7 @@ export const bootstrapInitialAdmin = createServerFn({ method: "POST" }).handler(
       .select("*", { count: "exact", head: true })
       .eq("role", "admin");
     if (countErr) throw new Error(countErr.message);
-    if ((count ?? 0) > 0) return { created: false };
+    if ((count ?? 0) > 0) return { created: false, reason: "already-exists" as const };
 
     // Find or create the bootstrap user.
     let userId: string | null = null;
@@ -28,15 +34,15 @@ export const bootstrapInitialAdmin = createServerFn({ method: "POST" }).handler(
     });
     if (listErr) throw new Error(listErr.message);
     const existing = list.users.find(
-      (u) => u.email?.toLowerCase() === BOOTSTRAP_EMAIL.toLowerCase(),
+      (u) => u.email?.toLowerCase() === email,
     );
     if (existing) {
       userId = existing.id;
     } else {
       const { data: created, error: createErr } =
         await supabaseAdmin.auth.admin.createUser({
-          email: BOOTSTRAP_EMAIL,
-          password: BOOTSTRAP_PASSWORD,
+          email,
+          password,
           email_confirm: true,
         });
       if (createErr) throw new Error(createErr.message);
