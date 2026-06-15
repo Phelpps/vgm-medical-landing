@@ -62,14 +62,46 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const catalog = [
-  { name: "Pinça Anatômica", desc: "Em aço inox, ideal para procedimentos delicados.", img: f1 },
-  { name: "Pinça de Dissecção", desc: "Precisão para tecidos finos e suturas.", img: f2 },
-  { name: "Pinça Kelly Hemostática", desc: "Hemostasia segura em cirurgias gerais.", img: f3 },
-  { name: "Porta-Agulhas", desc: "Pegada firme para fios cirúrgicos.", img: f4 },
-  { name: "Pinça Adson com Dente", desc: "Tração precisa em tecidos densos.", img: f5 },
-  { name: "Pinça Mosquito Curva", desc: "Hemostasia em pequenos vasos.", img: f6 },
-];
+type CatalogProduct = {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  image_url: string | null;
+  sort_order: number;
+};
+
+async function fetchCatalogProducts(): Promise<CatalogProduct[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, name, description, category, image_url, sort_order")
+    .order("category", { ascending: true })
+    .order("sort_order", { ascending: true })
+    .order("name", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as CatalogProduct[];
+}
+
+function useSignedImage(path: string | null) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    if (!path) {
+      setUrl(null);
+      return;
+    }
+    supabase.storage
+      .from("product-images")
+      .createSignedUrl(path, 60 * 60)
+      .then(({ data }) => {
+        if (!cancelled) setUrl(data?.signedUrl ?? null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [path]);
+  return url;
+}
 
 function whatsappLink(message: string) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
