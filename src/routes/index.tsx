@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Phone,
   MapPin,
@@ -12,14 +13,10 @@ import {
   Award,
   ArrowRight,
   Check,
+  ImageOff,
 } from "lucide-react";
 import heroImage from "@/assets/hero-forceps.jpg";
-import f1 from "@/assets/forceps-1.jpg";
-import f2 from "@/assets/forceps-2.jpg";
-import f3 from "@/assets/forceps-3.jpg";
-import f4 from "@/assets/forceps-4.jpg";
-import f5 from "@/assets/forceps-5.jpg";
-import f6 from "@/assets/forceps-6.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 const WHATSAPP_NUMBER = "556298341044";
 const PHONE_DISPLAY = "(62) 9834-1044";
