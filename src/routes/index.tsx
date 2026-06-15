@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Phone,
   MapPin,
@@ -12,14 +13,10 @@ import {
   Award,
   ArrowRight,
   Check,
+  ImageOff,
 } from "lucide-react";
 import heroImage from "@/assets/hero-forceps.jpg";
-import f1 from "@/assets/forceps-1.jpg";
-import f2 from "@/assets/forceps-2.jpg";
-import f3 from "@/assets/forceps-3.jpg";
-import f4 from "@/assets/forceps-4.jpg";
-import f5 from "@/assets/forceps-5.jpg";
-import f6 from "@/assets/forceps-6.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 const WHATSAPP_NUMBER = "556298341044";
 const PHONE_DISPLAY = "(62) 9834-1044";
@@ -65,14 +62,46 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const catalog = [
-  { name: "Pinça Anatômica", desc: "Em aço inox, ideal para procedimentos delicados.", img: f1 },
-  { name: "Pinça de Dissecção", desc: "Precisão para tecidos finos e suturas.", img: f2 },
-  { name: "Pinça Kelly Hemostática", desc: "Hemostasia segura em cirurgias gerais.", img: f3 },
-  { name: "Porta-Agulhas", desc: "Pegada firme para fios cirúrgicos.", img: f4 },
-  { name: "Pinça Adson com Dente", desc: "Tração precisa em tecidos densos.", img: f5 },
-  { name: "Pinça Mosquito Curva", desc: "Hemostasia em pequenos vasos.", img: f6 },
-];
+type CatalogProduct = {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  image_url: string | null;
+  sort_order: number;
+};
+
+async function fetchCatalogProducts(): Promise<CatalogProduct[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, name, description, category, image_url, sort_order")
+    .order("category", { ascending: true })
+    .order("sort_order", { ascending: true })
+    .order("name", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as CatalogProduct[];
+}
+
+function useSignedImage(path: string | null) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    if (!path) {
+      setUrl(null);
+      return;
+    }
+    supabase.storage
+      .from("product-images")
+      .createSignedUrl(path, 60 * 60)
+      .then(({ data }) => {
+        if (!cancelled) setUrl(data?.signedUrl ?? null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [path]);
+  return url;
+}
 
 function whatsappLink(message: string) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
@@ -259,7 +288,59 @@ function Trust() {
   );
 }
 
+function CategoryCard({ product }: { product: CatalogProduct }) {
+  const imgUrl = useSignedImage(product.image_url);
+  return (
+    <Link
+      to="/catalogo"
+      className="group overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] transition hover:-translate-y-1 hover:shadow-[var(--shadow-card)]"
+    >
+      <div className="relative grid aspect-square place-items-center overflow-hidden bg-secondary/50">
+        {product.image_url ? (
+          imgUrl ? (
+            <img
+              src={imgUrl}
+              alt={product.category}
+              loading="lazy"
+              className="h-full w-full object-contain p-6 transition duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="text-xs text-muted-foreground">Carregando…</div>
+          )
+        ) : (
+          <ImageOff className="h-10 w-10 text-muted-foreground" />
+        )}
+      </div>
+      <div className="border-t border-border p-5">
+        <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">
+          {product.category}
+        </span>
+        <h3 className="mt-1 text-base font-bold tracking-tight">{product.name}</h3>
+        {product.description && (
+          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
+        )}
+        <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-all group-hover:gap-2.5">
+          Ver categoria <ArrowRight className="h-4 w-4" />
+        </span>
+      </div>
+    </Link>
+  );
+}
+
 function Catalog() {
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: fetchCatalogProducts,
+  });
+
+  const firstByCategory = useMemo(() => {
+    const seen = new Map<string, CatalogProduct>();
+    for (const p of products) {
+      if (!seen.has(p.category)) seen.set(p.category, p);
+    }
+    return Array.from(seen.values());
+  }, [products]);
+
   return (
     <section id="catalogo" className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
       <div className="mb-12 max-w-2xl">
@@ -268,39 +349,27 @@ function Catalog() {
           Pinças cirúrgicas para cada necessidade.
         </h2>
         <p className="mt-3 text-muted-foreground">
-          Conheça uma seleção dos modelos mais procurados. Solicite o catálogo completo via WhatsApp.
+          Conheça nossas categorias de produtos. Acesse o catálogo completo para ver todos os modelos.
         </p>
       </div>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {catalog.map((p) => (
-          <article
-            key={p.name}
-            className="group overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] transition hover:-translate-y-1 hover:shadow-[var(--shadow-card)]"
-          >
-            <div className="relative aspect-square overflow-hidden bg-secondary/50">
-              <img
-                src={p.img}
-                alt={p.name}
-                loading="lazy"
-                width={768}
-                height={768}
-                className="h-full w-full object-contain p-6 transition duration-500 group-hover:scale-105"
-              />
-            </div>
-            <div className="border-t border-border p-5">
-              <h3 className="text-base font-bold tracking-tight">{p.name}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{p.desc}</p>
-              <a
-                href={whatsappLink(`Olá! Tenho interesse no produto: ${p.name}. Pode me enviar mais informações?`)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:gap-2.5 transition-all"
-              >
-                Consultar disponibilidade <ArrowRight className="h-4 w-4" />
-              </a>
-            </div>
-          </article>
-        ))}
+      {isLoading ? (
+        <p className="text-center text-muted-foreground">Carregando categorias…</p>
+      ) : firstByCategory.length === 0 ? (
+        <p className="text-center text-muted-foreground">Catálogo em breve.</p>
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {firstByCategory.map((p) => (
+            <CategoryCard key={p.category} product={p} />
+          ))}
+        </div>
+      )}
+      <div className="mt-10 text-center">
+        <Link
+          to="/catalogo"
+          className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] transition hover:opacity-90"
+        >
+          Ver catálogo completo <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
     </section>
   );
