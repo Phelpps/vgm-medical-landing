@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ChevronDown, MessageCircle, Search, ImageOff } from "lucide-react";
+import { ArrowLeft, ChevronDown, Search, ImageOff, Minus, Plus, ShoppingCart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-
-const WHATSAPP_NUMBER = "556298341044";
+import { useCart } from "@/lib/cart-context";
 
 export const Route = createFileRoute("/catalogo")({
   head: () => ({
@@ -28,10 +27,6 @@ type Product = {
   image_url: string | null;
   sort_order: number;
 };
-
-function whatsappLink(message: string) {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-}
 
 async function fetchProducts(): Promise<Product[]> {
   const { data, error } = await supabase
@@ -67,6 +62,9 @@ function useSignedImage(path: string | null) {
 
 function ProductRow({ p, isOpen, onToggle }: { p: Product; isOpen: boolean; onToggle: () => void }) {
   const imgUrl = useSignedImage(isOpen ? p.image_url : null);
+  const { add, increment, decrement, getQuantity } = useCart();
+  const qty = getQuantity(p.id);
+
   return (
     <li>
       <button
@@ -81,9 +79,16 @@ function ProductRow({ p, isOpen, onToggle }: { p: Product; isOpen: boolean; onTo
             <div className="mt-0.5 truncate text-xs text-muted-foreground">{p.description}</div>
           )}
         </div>
-        <ChevronDown
-          className={`h-5 w-5 shrink-0 text-muted-foreground transition-transform ${isOpen ? "rotate-180 text-primary" : ""}`}
-        />
+        <div className="flex items-center gap-3">
+          {qty > 0 && (
+            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+              {qty} no carrinho
+            </span>
+          )}
+          <ChevronDown
+            className={`h-5 w-5 shrink-0 text-muted-foreground transition-transform ${isOpen ? "rotate-180 text-primary" : ""}`}
+          />
+        </div>
       </button>
       {isOpen && (
         <div className="grid gap-5 border-t border-border bg-secondary/30 p-5 sm:grid-cols-[220px_1fr] sm:items-center">
@@ -106,14 +111,37 @@ function ProductRow({ p, isOpen, onToggle }: { p: Product; isOpen: boolean; onTo
           <div>
             <div className="text-base font-bold">{p.name}</div>
             {p.description && <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>}
-            <a
-              href={whatsappLink(`Olá! Tenho interesse no produto: ${p.name}. Pode me enviar mais informações?`)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] transition hover:opacity-90"
-            >
-              <MessageCircle className="h-4 w-4" /> Consultar no WhatsApp
-            </a>
+            <div className="mt-4">
+              {qty === 0 ? (
+                <button
+                  type="button"
+                  onClick={() => add({ id: p.id, name: p.name, category: p.category })}
+                  className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] transition hover:opacity-90"
+                >
+                  <Plus className="h-4 w-4" /> Adicionar ao carrinho
+                </button>
+              ) : (
+                <div className="inline-flex items-center gap-2 rounded-full border border-border bg-white p-1 shadow-[var(--shadow-soft)]">
+                  <button
+                    type="button"
+                    onClick={() => decrement(p.id)}
+                    className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                    aria-label="Diminuir"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <span className="min-w-[2ch] text-center text-sm font-bold">{qty}</span>
+                  <button
+                    type="button"
+                    onClick={() => increment(p.id)}
+                    className="grid h-9 w-9 place-items-center rounded-full bg-[image:var(--gradient-primary)] text-primary-foreground transition hover:opacity-90"
+                    aria-label="Aumentar"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
