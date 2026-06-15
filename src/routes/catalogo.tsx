@@ -152,6 +152,7 @@ function ProductRow({ p, isOpen, onToggle }: { p: Product; isOpen: boolean; onTo
 function CatalogPage() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const { totalCount } = useCart();
 
   const { data: products = [], isLoading, error } = useQuery({
     queryKey: ["products"],
