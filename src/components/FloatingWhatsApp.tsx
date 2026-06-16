@@ -1,8 +1,12 @@
 import { MessageCircle } from "lucide-react";
+import { useRouterState } from "@tanstack/react-router";
 
 const WHATSAPP_NUMBER = "556298341044";
 
 export function FloatingWhatsApp() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  if (pathname !== "/catalogo") return null;
+
   return (
     <a
       href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Olá! Gostaria de mais informações sobre os produtos da VGM Medical.")}`}
