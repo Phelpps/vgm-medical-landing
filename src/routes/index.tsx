@@ -2,62 +2,40 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Phone,
-  MapPin,
-  Mail,
-  Instagram,
-  Facebook,
-  MessageCircle,
   ShieldCheck,
   Truck,
   Award,
   ArrowRight,
   Check,
   ImageOff,
+  Wrench,
+  Package,
+  CalendarDays,
 } from "lucide-react";
-import heroImage from "@/assets/hero-forceps.jpg";
+import surgicalImage from "@/assets/surgical-room.jpg";
+import logo from "@/assets/vgm-logo.jpeg.asset.json";
 import { supabase } from "@/integrations/supabase/client";
-
-const WHATSAPP_NUMBER = "556298341044";
-const PHONE_DISPLAY = "(62) 9834-1044";
-const ADDRESS = "Goiânia, Goiás — Brasil";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "VGM Medical — Revendedora de Produtos Médicos em Goiânia" },
+      { title: "VGM Medical — Equipamentos e Instrumentais Médicos" },
       {
         name: "description",
         content:
-          "VGM Medical: revendedora de produtos médicos em Goiânia, Goiás. Venda de pinças cirúrgicas e instrumentos hospitalares com qualidade certificada e entrega rápida.",
+          "VGM Medical: equipamentos e instrumentais médicos com +20 anos de experiência, +2000 produtos e assistência técnica especializada.",
       },
-      { name: "keywords", content: "pinças médicas, instrumentos cirúrgicos, produtos médicos Goiânia, revendedora produtos médicos, VGM Medical" },
-      { property: "og:title", content: "VGM Medical — Revendedora de Produtos Médicos" },
-      { property: "og:description", content: "Venda de pinças médicas e instrumentos cirúrgicos em Goiânia, Goiás." },
+      { name: "keywords", content: "equipamentos médicos, instrumentais cirúrgicos, assistência técnica médica, VGM Medical" },
+      { property: "og:title", content: "VGM Medical — Equipamentos e Instrumentais Médicos" },
+      { property: "og:description", content: "Equipamentos e instrumentais médicos com qualidade certificada e assistência técnica especializada." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/" },
-      { property: "og:image", content: heroImage },
+      { property: "og:image", content: surgicalImage },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "/" }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "MedicalBusiness",
-          name: "VGM Medical",
-          description: "Revendedora de produtos médicos e pinças cirúrgicas",
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: "Goiânia",
-            addressRegion: "GO",
-            addressCountry: "BR",
-          },
-          areaServed: "Goiânia, Goiás",
-        }),
-      },
-    ],
   }),
   component: Index,
 });
@@ -103,143 +81,57 @@ function useSignedImage(path: string | null) {
   return url;
 }
 
-function whatsappLink(message: string) {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-}
-
 function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Header />
+      <SiteHeader />
       <main>
         <Hero />
         <Trust />
+        <Stats />
         <Catalog />
-        <About />
-        <Contact />
+        <Partners />
+        <ServiceCTA />
       </main>
-      <Footer />
+      <SiteFooter />
     </div>
-  );
-}
-
-function Header() {
-  const [open, setOpen] = useState(false);
-  const links = [
-    { href: "/catalogo", label: "Catálogo", route: true as const },
-    { href: "#sobre", label: "Sobre" },
-    { href: "#contato", label: "Contato" },
-  ];
-  return (
-    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-        <a href="#topo" className="flex items-center gap-2">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-[image:var(--gradient-primary)] text-primary-foreground shadow-[var(--shadow-soft)]">
-            <span className="text-sm font-extrabold tracking-tight">VGM</span>
-          </div>
-          <div className="leading-tight">
-            <div className="text-sm font-bold tracking-tight">VGM Medical</div>
-            <div className="text-[11px] text-muted-foreground">Goiânia · GO</div>
-          </div>
-        </a>
-        <nav className="hidden items-center gap-8 md:flex">
-          {links.map((l) =>
-            "route" in l ? (
-              <Link key={l.href} to={l.href} className="text-sm font-medium text-muted-foreground transition hover:text-primary">
-                {l.label}
-              </Link>
-            ) : (
-              <a key={l.href} href={l.href} className="text-sm font-medium text-muted-foreground transition hover:text-primary">
-                {l.label}
-              </a>
-            ),
-          )}
-          <a
-            href={whatsappLink("Olá! Vim pelo site da VGM Medical e gostaria de mais informações.")}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] transition hover:opacity-90"
-          >
-            <MessageCircle className="h-4 w-4" /> WhatsApp
-          </a>
-        </nav>
-        <button
-          aria-label="Abrir menu"
-          onClick={() => setOpen((s) => !s)}
-          className="rounded-md p-2 text-foreground md:hidden"
-        >
-          <div className="space-y-1.5">
-            <span className="block h-0.5 w-5 bg-current" />
-            <span className="block h-0.5 w-5 bg-current" />
-            <span className="block h-0.5 w-5 bg-current" />
-          </div>
-        </button>
-      </div>
-      {open && (
-        <div className="border-t border-border bg-background md:hidden">
-          <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3">
-            {links.map((l) =>
-              "route" in l ? (
-                <Link key={l.href} to={l.href} onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary">
-                  {l.label}
-                </Link>
-              ) : (
-                <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary">
-                  {l.label}
-                </a>
-              ),
-            )}
-            <a
-              href={whatsappLink("Olá! Vim pelo site da VGM Medical.")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-flex items-center justify-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-5 py-2.5 text-sm font-semibold text-primary-foreground"
-            >
-              <MessageCircle className="h-4 w-4" /> Fale no WhatsApp
-            </a>
-          </div>
-        </div>
-      )}
-    </header>
   );
 }
 
 function Hero() {
   return (
-    <section id="topo" className="relative overflow-hidden">
+    <section className="relative overflow-hidden">
       <div className="absolute inset-0 -z-10" style={{ background: "var(--gradient-hero)" }} />
-      <div className="absolute inset-0 -z-10 opacity-60 [background-image:radial-gradient(circle_at_top_right,oklch(0.78_0.13_200/0.35),transparent_50%),radial-gradient(circle_at_bottom_left,oklch(0.62_0.14_220/0.25),transparent_55%)]" />
+      <div className="absolute inset-0 -z-10 opacity-70 [background-image:radial-gradient(circle_at_top_right,oklch(0.88_0.045_195/0.5),transparent_55%),radial-gradient(circle_at_bottom_left,oklch(0.28_0.025_200/0.18),transparent_55%)]" />
       <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-12 lg:py-24">
         <div>
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white/70 px-3 py-1 text-xs font-semibold text-primary backdrop-blur">
-            <ShieldCheck className="h-3.5 w-3.5" /> Produtos médicos certificados
+            <ShieldCheck className="h-3.5 w-3.5" /> Equipamentos médicos certificados
           </span>
           <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
-            Pinças médicas com{" "}
-            <span className="bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">precisão clínica</span> para você.
+            Equipamentos e instrumentais médicos com{" "}
+            <span className="bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">precisão clínica</span>.
           </h1>
           <p className="mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
-            A VGM Medical é revendedora de produtos médicos em Goiânia, Goiás. Trabalhamos com pinças cirúrgicas em aço inoxidável de
-            alta qualidade, com entrega rápida e atendimento dedicado.
+            Há mais de 20 anos a VGM Medical fornece equipamentos e instrumentais cirúrgicos para hospitais, clínicas
+            e profissionais — com curadoria técnica, marcas reconhecidas e assistência técnica especializada.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a
-              href={whatsappLink("Olá VGM Medical! Quero solicitar um orçamento de pinças médicas.")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:scale-[1.02]"
-            >
-              Solicitar orçamento <ArrowRight className="h-4 w-4" />
-            </a>
             <Link
               to="/catalogo"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:scale-[1.02]"
+            >
+              Ver catálogo <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              to="/contato"
               className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white/80 px-7 py-3.5 text-sm font-semibold text-foreground backdrop-blur transition hover:bg-white"
             >
-              Ver catálogo
+              Falar com a equipe
             </Link>
           </div>
           <div className="mt-8 flex flex-wrap gap-6 text-sm text-muted-foreground">
-            {["Aço inoxidável", "Entrega para todo Brasil", "Atendimento humano"].map((t) => (
+            {["Marcas parceiras", "Assistência técnica", "Entrega para todo Brasil"].map((t) => (
               <div key={t} className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-primary" /> {t}
               </div>
@@ -247,15 +139,18 @@ function Hero() {
           </div>
         </div>
         <div className="relative">
-          <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-[image:var(--gradient-primary)] opacity-20 blur-2xl" />
+          <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-[image:var(--gradient-primary)] opacity-15 blur-2xl" />
           <div className="overflow-hidden rounded-3xl border border-white/60 bg-white shadow-[var(--shadow-card)]">
             <img
-              src={heroImage}
-              alt="Pinças médicas em aço inoxidável VGM Medical"
+              src={surgicalImage}
+              alt="Centro cirúrgico moderno com instrumentais médicos"
               width={1536}
               height={1024}
               className="h-full w-full object-cover"
             />
+          </div>
+          <div className="absolute -bottom-6 -left-6 hidden h-28 w-28 rounded-full border-4 border-white bg-white shadow-[var(--shadow-card)] sm:block">
+            <img src={logo.url} alt="VGM Medical" className="h-full w-full rounded-full object-cover" />
           </div>
         </div>
       </div>
@@ -265,9 +160,9 @@ function Hero() {
 
 function Trust() {
   const items = [
-    { icon: ShieldCheck, title: "Qualidade certificada", desc: "Instrumentos em aço inox cirúrgico." },
-    { icon: Truck, title: "Entrega ágil", desc: "Despachamos de Goiânia para todo o Brasil." },
-    { icon: Award, title: "Atendimento especialista", desc: "Indicação correta para cada procedimento." },
+    { icon: ShieldCheck, title: "Qualidade certificada", desc: "Equipamentos e instrumentais de marcas reconhecidas." },
+    { icon: Wrench, title: "Assistência técnica", desc: "Suporte e manutenção especializada." },
+    { icon: Truck, title: "Entrega ágil", desc: "Logística rápida para todo o Brasil." },
   ];
   return (
     <section className="border-y border-border/60 bg-secondary/40">
@@ -288,6 +183,30 @@ function Trust() {
   );
 }
 
+function Stats() {
+  const stats = [
+    { icon: CalendarDays, n: "+20 anos", l: "de experiência" },
+    { icon: Package, n: "+2000", l: "produtos no catálogo" },
+    { icon: Wrench, n: "Assistência", l: "técnica especializada" },
+    { icon: Award, n: "Marcas", l: "parceiras reconhecidas" },
+  ];
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((s) => (
+          <div key={s.l} className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)]">
+            <s.icon className="h-6 w-6 text-primary" />
+            <div className="mt-3 bg-[image:var(--gradient-primary)] bg-clip-text text-2xl font-extrabold text-transparent">
+              {s.n}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">{s.l}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function CategoryCard({ product }: { product: CatalogProduct }) {
   const imgUrl = useSignedImage(product.image_url);
   return (
@@ -298,12 +217,8 @@ function CategoryCard({ product }: { product: CatalogProduct }) {
       <div className="relative grid aspect-square place-items-center overflow-hidden bg-secondary/50">
         {product.image_url ? (
           imgUrl ? (
-            <img
-              src={imgUrl}
-              alt={product.category}
-              loading="lazy"
-              className="h-full w-full object-contain p-6 transition duration-500 group-hover:scale-105"
-            />
+            <img src={imgUrl} alt={product.category} loading="lazy"
+              className="h-full w-full object-contain p-6 transition duration-500 group-hover:scale-105" />
           ) : (
             <div className="text-xs text-muted-foreground">Carregando…</div>
           )
@@ -312,9 +227,7 @@ function CategoryCard({ product }: { product: CatalogProduct }) {
         )}
       </div>
       <div className="border-t border-border p-5">
-        <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">
-          {product.category}
-        </span>
+        <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">{product.category}</span>
         <h3 className="mt-1 text-base font-bold tracking-tight">{product.name}</h3>
         {product.description && (
           <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
@@ -346,10 +259,10 @@ function Catalog() {
       <div className="mb-12 max-w-2xl">
         <span className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Catálogo</span>
         <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Pinças cirúrgicas para cada necessidade.
+          Equipamentos e instrumentais para cada necessidade.
         </h2>
         <p className="mt-3 text-muted-foreground">
-          Conheça nossas categorias de produtos. Acesse o catálogo completo para ver todos os modelos.
+          Conheça nossas categorias. Acesse o catálogo completo para ver todos os produtos.
         </p>
       </div>
       {isLoading ? (
@@ -375,53 +288,28 @@ function Catalog() {
   );
 }
 
-function About() {
+function Partners() {
+  const brands = ["Russer", "Endoctus"];
   return (
-    <section id="sobre" className="bg-secondary/30">
-      <div className="mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:items-center">
-        <div>
-          <span className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Sobre nós</span>
+    <section className="bg-secondary/30">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <div className="mb-10 text-center">
+          <span className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Marcas parceiras</span>
           <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Confiança goiana para hospitais, clínicas e profissionais.
+            Trabalhamos com marcas de confiança.
           </h2>
-          <p className="mt-4 text-muted-foreground">
-            A <strong className="text-foreground">VGM Medical</strong> nasceu em Goiânia com a missão de oferecer
-            instrumentos cirúrgicos de alta precisão a um preço justo. Atendemos hospitais, consultórios e
-            profissionais autônomos com curadoria técnica, suporte rápido e logística confiável.
+          <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+            Parcerias com fabricantes reconhecidos no mercado para entregar a melhor qualidade aos nossos clientes.
           </p>
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            {[
-              { n: "100%", l: "Aço inox cirúrgico" },
-              { n: "+500", l: "Clientes atendidos" },
-              { n: "24h", l: "Resposta no WhatsApp" },
-            ].map((s) => (
-              <div key={s.l} className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
-                <div className="bg-[image:var(--gradient-primary)] bg-clip-text text-2xl font-extrabold text-transparent">
-                  {s.n}
-                </div>
-                <div className="mt-1 text-xs text-muted-foreground">{s.l}</div>
-              </div>
-            ))}
-          </div>
         </div>
-        <div className="relative">
-          <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-[image:var(--gradient-primary)] opacity-15 blur-3xl" />
-          <div className="rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-card)]">
-            <ul className="space-y-4">
-              {[
-                "Curadoria técnica de produtos médicos.",
-                "Atendimento humano e consultivo.",
-                "Logística rápida saindo de Goiânia.",
-                "Suporte pós-venda dedicado.",
-              ].map((t) => (
-                <li key={t} className="flex items-start gap-3">
-                  <div className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[image:var(--gradient-primary)] text-primary-foreground">
-                    <Check className="h-3.5 w-3.5" />
-                  </div>
-                  <span className="text-sm text-foreground">{t}</span>
-                </li>
-              ))}
-            </ul>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {brands.map((b) => (
+            <div key={b} className="grid h-24 place-items-center rounded-2xl border border-border bg-card text-lg font-bold tracking-tight text-primary shadow-[var(--shadow-soft)]">
+              {b}
+            </div>
+          ))}
+          <div className="grid h-24 place-items-center rounded-2xl border border-dashed border-border bg-card/50 text-sm text-muted-foreground">
+            e outras
           </div>
         </div>
       </div>
@@ -429,171 +317,28 @@ function About() {
   );
 }
 
-function Contact() {
-  const [form, setForm] = useState({ name: "", phone: "", message: "" });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const text = `Olá VGM Medical! Sou ${form.name || "—"} (telefone: ${form.phone || "—"}).%0A%0A${form.message}`;
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, "_blank", "noopener,noreferrer");
-  };
-
+function ServiceCTA() {
   return (
-    <section id="contato" className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-      <div className="mb-12 max-w-2xl">
-        <span className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Contato</span>
-        <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Fale com a nossa equipe.
-        </h2>
-        <p className="mt-3 text-muted-foreground">
-          Envie sua mensagem e responderemos diretamente pelo WhatsApp.
-        </p>
-      </div>
-
-      <div className="grid gap-8 lg:grid-cols-2">
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] sm:p-8">
+    <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+      <div className="overflow-hidden rounded-3xl border border-border bg-[image:var(--gradient-primary)] p-10 text-primary-foreground shadow-[var(--shadow-card)] sm:p-14">
+        <div className="grid items-center gap-8 lg:grid-cols-[1fr_auto]">
           <div>
-            <label htmlFor="name" className="text-sm font-semibold">Nome</label>
-            <input
-              id="name"
-              required
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="mt-1.5 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-              placeholder="Seu nome completo"
-            />
+            <span className="text-xs font-bold uppercase tracking-[0.18em] opacity-80">Assistência técnica</span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+              Realizamos assistência técnica especializada.
+            </h2>
+            <p className="mt-3 max-w-2xl opacity-90">
+              Manutenção e suporte técnico para equipamentos médicos. Fale conosco para um orçamento.
+            </p>
           </div>
-          <div>
-            <label htmlFor="phone" className="text-sm font-semibold">Telefone</label>
-            <input
-              id="phone"
-              required
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              className="mt-1.5 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-              placeholder="(62) 90000-0000"
-            />
-          </div>
-          <div>
-            <label htmlFor="message" className="text-sm font-semibold">Mensagem</label>
-            <textarea
-              id="message"
-              required
-              rows={5}
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-              className="mt-1.5 w-full resize-none rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-              placeholder="Conte o que você precisa: produto, quantidade, prazo…"
-            />
-          </div>
-          <button
-            type="submit"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:opacity-95"
+          <Link
+            to="/contato"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-primary shadow-[var(--shadow-soft)] transition hover:bg-white/90"
           >
-            <MessageCircle className="h-4 w-4" /> Enviar pelo WhatsApp
-          </button>
-        </form>
-
-        <div className="space-y-6">
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] sm:p-8">
-            <div className="space-y-4">
-              <ContactRow icon={MapPin} title="Endereço" value={ADDRESS} />
-              <ContactRow icon={Phone} title="Telefone" value={PHONE_DISPLAY} href={`tel:+${WHATSAPP_NUMBER}`} />
-              <ContactRow icon={Mail} title="E-mail" value="contato@vgmmedical.com.br" href="mailto:contato@vgmmedical.com.br" />
-            </div>
-          </div>
-          <div className="overflow-hidden rounded-2xl border border-border shadow-[var(--shadow-soft)]">
-            <iframe
-              title="VGM Medical em Goiânia, Goiás"
-              src="https://www.google.com/maps?q=Goi%C3%A2nia%2C+Goi%C3%A1s&output=embed"
-              loading="lazy"
-              className="h-72 w-full border-0"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
+            Falar com a equipe <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </section>
-  );
-}
-
-function ContactRow({ icon: Icon, title, value, href }: { icon: typeof MapPin; title: string; value: string; href?: string }) {
-  const inner = (
-    <div className="flex items-start gap-3">
-      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-secondary text-primary">
-        <Icon className="h-5 w-5" />
-      </div>
-      <div className="min-w-0">
-        <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</div>
-        <div className="truncate text-sm font-medium text-foreground">{value}</div>
-      </div>
-    </div>
-  );
-  return href ? (
-    <a href={href} className="block transition hover:opacity-80">{inner}</a>
-  ) : (
-    inner
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="border-t border-border bg-secondary/40">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-[image:var(--gradient-primary)] text-primary-foreground">
-              <span className="text-sm font-extrabold">VGM</span>
-            </div>
-            <div>
-              <div className="text-sm font-bold">VGM Medical</div>
-              <div className="text-xs text-muted-foreground">Goiânia · Goiás</div>
-            </div>
-          </div>
-          <p className="mt-4 max-w-xs text-sm text-muted-foreground">
-            Revendedora de produtos médicos. Pinças cirúrgicas e instrumentos hospitalares com qualidade certificada.
-          </p>
-        </div>
-        <div>
-          <div className="text-xs font-bold uppercase tracking-wider text-foreground">Navegação</div>
-          <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/catalogo" className="hover:text-primary">Catálogo</Link></li>
-            <li><a href="#sobre" className="hover:text-primary">Sobre nós</a></li>
-            <li><a href="#contato" className="hover:text-primary">Contato</a></li>
-          </ul>
-        </div>
-        <div>
-          <div className="text-xs font-bold uppercase tracking-wider text-foreground">Redes sociais</div>
-          <div className="mt-4 flex gap-3">
-            {[
-              { icon: Instagram, href: "https://instagram.com", label: "Instagram" },
-              { icon: Facebook, href: "https://facebook.com", label: "Facebook" },
-              { icon: MessageCircle, href: whatsappLink("Olá VGM Medical!"), label: "WhatsApp" },
-            ].map((s) => (
-              <a
-                key={s.label}
-                href={s.href}
-                aria-label={s.label}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card text-foreground transition hover:bg-[image:var(--gradient-primary)] hover:text-primary-foreground"
-              >
-                <s.icon className="h-4 w-4" />
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="border-t border-border">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:px-6">
-          <span>© {new Date().getFullYear()} VGM Medical. Todos os direitos reservados.</span>
-          <span className="flex items-center gap-3">
-            <span>Goiânia · Goiás · Brasil</span>
-            <span aria-hidden>·</span>
-            <Link to="/auth" className="hover:text-primary">Área restrita</Link>
-          </span>
-        </div>
-      </div>
-    </footer>
   );
 }
