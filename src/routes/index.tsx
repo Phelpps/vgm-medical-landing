@@ -289,7 +289,13 @@ function Catalog() {
 }
 
 function Partners() {
-  const brands = ["Russer", "Endoctus"];
+  const brands: { name: string; url: string }[] = [
+    {
+      name: "Russer",
+      url: "https://www.russer.com/?utm_source=google&gad_campaignid=23480298474&gclid=CjwKCAjw6MPRBhBTEiwAd-7MryNvQezaLfCa_aoqc7_J_MQ6JsyL2t7buoCLxPUzcCqkVPxuaoamKBoCD5AQAvD_BwE&utm_content=b&utm_campaign=bc_search_leads_catalogo2026%2F01%2F21&gad_source=1&utm_medium=cpc&utm_term=russer",
+    },
+    { name: "Endoctus", url: "https://doctus.med.br" },
+  ];
   return (
     <section className="bg-secondary/30">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -304,9 +310,15 @@ function Partners() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {brands.map((b) => (
-            <div key={b} className="grid h-24 place-items-center rounded-2xl border border-border bg-card text-lg font-bold tracking-tight text-primary shadow-[var(--shadow-soft)]">
-              {b}
-            </div>
+            <a
+              key={b.name}
+              href={b.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="grid h-24 place-items-center rounded-2xl border border-border bg-card text-lg font-bold tracking-tight text-primary shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-card)]"
+            >
+              {b.name}
+            </a>
           ))}
           <div className="grid h-24 place-items-center rounded-2xl border border-dashed border-border bg-card/50 text-sm text-muted-foreground">
             e outras
