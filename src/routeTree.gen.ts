@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -19,6 +20,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
   path: '/sobre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContatoRoute = ContatoRouteImport.update({
+  id: '/contato',
+  path: '/contato',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatalogoRoute = CatalogoRouteImport.update({
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/carrinho': typeof CarrinhoRoute
   '/catalogo': typeof CatalogoRoute
+  '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/carrinho': typeof CarrinhoRoute
   '/catalogo': typeof CatalogoRoute
+  '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
 }
 export interface FileRoutesById {
@@ -70,13 +78,28 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/carrinho': typeof CarrinhoRoute
   '/catalogo': typeof CatalogoRoute
+  '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/auth' | '/carrinho' | '/catalogo' | '/sobre'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/carrinho'
+    | '/catalogo'
+    | '/contato'
+    | '/sobre'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/auth' | '/carrinho' | '/catalogo' | '/sobre'
+  to:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/carrinho'
+    | '/catalogo'
+    | '/contato'
+    | '/sobre'
   id:
     | '__root__'
     | '/'
@@ -84,6 +107,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/carrinho'
     | '/catalogo'
+    | '/contato'
     | '/sobre'
   fileRoutesById: FileRoutesById
 }
@@ -93,6 +117,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CarrinhoRoute: typeof CarrinhoRoute
   CatalogoRoute: typeof CatalogoRoute
+  ContatoRoute: typeof ContatoRoute
   SobreRoute: typeof SobreRoute
 }
 
@@ -103,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/sobre'
       fullPath: '/sobre'
       preLoaderRoute: typeof SobreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contato': {
+      id: '/contato'
+      path: '/contato'
+      fullPath: '/contato'
+      preLoaderRoute: typeof ContatoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catalogo': {
@@ -149,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CarrinhoRoute: CarrinhoRoute,
   CatalogoRoute: CatalogoRoute,
+  ContatoRoute: ContatoRoute,
   SobreRoute: SobreRoute,
 }
 export const routeTree = rootRouteImport
