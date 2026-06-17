@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
-import logo from "@/assets/vgm-logo.jpeg.asset.json";
+import logo from "@/assets/vgm-logo.png.asset.json";
 
 const WHATSAPP_NUMBER = "556298341044";
 

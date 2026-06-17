@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Facebook, MessageCircle } from "lucide-react";
-import logo from "@/assets/vgm-logo.jpeg.asset.json";
+import logo from "@/assets/vgm-logo.png.asset.json";
 
 const WHATSAPP_NUMBER = "556298341044";
 function whatsappLink(message: string) {
