@@ -13,6 +13,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "../lib/cart-context";
 import { FloatingWhatsApp } from "../components/FloatingWhatsApp";
+import faviconAsset from "../assets/vgm-favicon.jpeg.asset.json";
+
 
 function NotFoundComponent() {
   return (
@@ -97,6 +99,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", type: "image/jpeg", href: faviconAsset.url },
+      { rel: "apple-touch-icon", href: faviconAsset.url },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

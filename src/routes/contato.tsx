@@ -70,7 +70,7 @@ function ContatoPage() {
             <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] sm:p-8">
               <div className="space-y-4">
                 <Row icon={Phone} title="Telefone / WhatsApp" value={PHONE_DISPLAY} href={`tel:+${WHATSAPP_NUMBER}`} />
-                <Row icon={Mail} title="E-mail" value="contato@vgmmedical.com.br" href="mailto:contato@vgmmedical.com.br" />
+                <Row icon={Mail} title="E-mail" value="vgmmedical.orcamento@outlook.com" href="mailto:vgmmedical.orcamento@outlook.com" />
                 <Row icon={MapPin} title="Atendimento" value="Brasil — entregamos para todo o país" />
               </div>
             </div>

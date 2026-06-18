@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Facebook, MessageCircle } from "lucide-react";
+import { Instagram, Linkedin, MessageCircle } from "lucide-react";
 import logo from "@/assets/vgm-logo.png.asset.json";
 
 const WHATSAPP_NUMBER = "556298341044";
@@ -35,8 +35,8 @@ export function SiteFooter() {
           <div className="text-xs font-bold uppercase tracking-wider text-foreground">Redes sociais</div>
           <div className="mt-4 flex gap-3">
             {[
-              { icon: Instagram, href: "https://instagram.com", label: "Instagram" },
-              { icon: Facebook, href: "https://facebook.com", label: "Facebook" },
+              { icon: Instagram, href: "https://www.instagram.com/vgm.medical/", label: "Instagram" },
+              { icon: Linkedin, href: "https://www.linkedin.com/in/vgm-medical-563563374/", label: "LinkedIn" },
               { icon: MessageCircle, href: whatsappLink("Olá VGM Medical!"), label: "WhatsApp" },
             ].map((s) => (
               <a
