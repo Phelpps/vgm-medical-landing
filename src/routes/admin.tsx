@@ -215,6 +215,28 @@ function AdminPage() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)] sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[image:var(--gradient-primary)] text-primary-foreground">
+              <Mail className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Conectado como</div>
+              <div className="truncate text-sm font-semibold">{userEmail ?? "—"}</div>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowChangePassword(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold hover:bg-secondary"
+          >
+            <KeyRound className="h-4 w-4" /> Alterar senha
+          </button>
+        </div>
+
+        {showChangePassword && (
+          <ChangePasswordForm onClose={() => setShowChangePassword(false)} />
+        )}
+
         {showNewUser && (
           <NewAdminForm
             onClose={() => setShowNewUser(false)}
