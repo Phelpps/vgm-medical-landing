@@ -53,6 +53,7 @@ function AdminPage() {
         return;
       }
       setUserId(data.user.id);
+      setUserEmail(data.user.email ?? null);
       const { data: roles } = await supabase
         .from("user_roles")
         .select("role")
