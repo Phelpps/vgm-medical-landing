@@ -36,10 +36,12 @@ function AdminPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [userId, setUserId] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [signedThumbs, setSignedThumbs] = useState<Record<string, string>>({});
   const [showNewUser, setShowNewUser] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const createUser = useServerFn(createAdminUser);
 
   useEffect(() => {
