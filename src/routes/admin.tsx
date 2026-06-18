@@ -484,3 +484,87 @@ function NewAdminForm({
     </div>
   );
 }
+
+function ChangePasswordForm({ onClose }: { onClose: () => void }) {
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [ok, setOk] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setErr(null);
+    setOk(null);
+    if (password.length < 6) {
+      setErr("A senha deve ter ao menos 6 caracteres.");
+      return;
+    }
+    if (password !== confirm) {
+      setErr("As senhas não coincidem.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
+      setOk("Senha alterada com sucesso.");
+      setPassword("");
+      setConfirm("");
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Erro ao alterar senha.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mb-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-base font-bold">Alterar senha</h2>
+        <button onClick={onClose} className="rounded-md p-2 text-muted-foreground hover:bg-secondary">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+      <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
+        <Field label="Nova senha (mínimo 6 caracteres)">
+          <input
+            type="password"
+            autoComplete="new-password"
+            required
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+        </Field>
+        <Field label="Confirmar nova senha">
+          <input
+            type="password"
+            autoComplete="new-password"
+            required
+            minLength={6}
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+        </Field>
+        {err && <p className="sm:col-span-2 text-sm text-destructive">{err}</p>}
+        {ok && <p className="sm:col-span-2 text-sm text-primary">{ok}</p>}
+        <div className="sm:col-span-2 flex justify-end gap-2">
+          <button type="button" onClick={onClose} className="rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold hover:bg-secondary">
+            Fechar
+          </button>
+          <button
+            type="submit"
+            disabled={busy || password.length < 6 || password !== confirm}
+            className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-5 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:opacity-90 disabled:opacity-50"
+          >
+            {busy ? "Salvando…" : "Salvar nova senha"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
