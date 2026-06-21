@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Minus, Plus, ShoppingCart, Trash2, MessageCircle } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
+import logo from "@/assets/vgm-logo-new.jpeg.asset.json";
 
 const WHATSAPP_NUMBER = "556298341044";
 
@@ -31,12 +32,16 @@ function CartPage() {
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-[image:var(--gradient-primary)] text-primary-foreground shadow-[var(--shadow-soft)]">
-              <span className="text-sm font-extrabold tracking-tight">VGM</span>
-            </div>
+            <img
+              src={logo.url}
+              alt="VGM Medical"
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded-full object-cover shadow-[var(--shadow-soft)]"
+            />
             <div className="leading-tight">
               <div className="text-sm font-bold tracking-tight">VGM Medical</div>
-              <div className="text-[11px] text-muted-foreground">Goiânia · GO</div>
+              <div className="text-[11px] text-muted-foreground">Equipamentos & Instrumentais</div>
             </div>
           </Link>
           <Link

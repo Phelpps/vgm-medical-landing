@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ChevronDown, Search, ImageOff, Minus, Plus, ShoppingCart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/lib/cart-context";
+import logo from "@/assets/vgm-logo-new.jpeg.asset.json";
 
 export const Route = createFileRoute("/catalogo")({
   head: () => ({
@@ -183,12 +184,16 @@ function CatalogPage() {
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-[image:var(--gradient-primary)] text-primary-foreground shadow-[var(--shadow-soft)]">
-              <span className="text-sm font-extrabold tracking-tight">VGM</span>
-            </div>
+            <img
+              src={logo.url}
+              alt="VGM Medical"
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded-full object-cover shadow-[var(--shadow-soft)]"
+            />
             <div className="leading-tight">
               <div className="text-sm font-bold tracking-tight">VGM Medical</div>
-              <div className="text-[11px] text-muted-foreground">Goiânia · GO</div>
+              <div className="text-[11px] text-muted-foreground">Equipamentos & Instrumentais</div>
             </div>
           </Link>
           <div className="flex items-center gap-2">
