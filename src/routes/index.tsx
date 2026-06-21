@@ -13,7 +13,7 @@ import {
   CalendarDays,
 } from "lucide-react";
 import surgicalImage from "@/assets/surgical-room.jpg";
-import logo from "@/assets/vgm-logo.png.asset.json";
+import logo from "@/assets/vgm-logo-new.jpeg.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";

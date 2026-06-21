@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, ArrowRight, Wrench, Award, Truck, Users } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import logo from "@/assets/vgm-logo.png.asset.json";
+import logo from "@/assets/vgm-logo-new.jpeg.asset.json";
 
 export const Route = createFileRoute("/sobre")({
   head: () => ({
