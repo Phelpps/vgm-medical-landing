@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import heroInstruments from "@/assets/surgical-instruments-hero.jpg.asset.json";
 import { useQuery } from "@tanstack/react-query";
 import {
   ShieldCheck,
