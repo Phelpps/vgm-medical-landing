@@ -145,8 +145,8 @@ function Hero() {
           <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-[image:var(--gradient-primary)] opacity-15 blur-2xl" />
           <div className="overflow-hidden rounded-3xl border border-white/60 bg-white shadow-[var(--shadow-card)]">
             <img
-              src={surgicalImage}
-              alt="Centro cirúrgico moderno com instrumentais médicos"
+              src={heroInstruments.url}
+              alt="Pinças e instrumentais cirúrgicos de precisão em ambiente estéril"
               width={1536}
               height={1024}
               className="h-full w-full object-cover"
