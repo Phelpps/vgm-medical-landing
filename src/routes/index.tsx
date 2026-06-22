@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import surgicalImage from "@/assets/surgical-room.jpg";
 import logo from "@/assets/vgm-logo-new.jpeg.asset.json";
+import russerLogo from "@/assets/russer-logo.png.asset.json";
+import endoctusLogo from "@/assets/endoctus-logo.png.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -289,12 +291,13 @@ function Catalog() {
 }
 
 function Partners() {
-  const brands: { name: string; url: string }[] = [
+  const brands: { name: string; url: string; logo: string }[] = [
     {
       name: "Russer",
       url: "https://www.russer.com/?utm_source=google&gad_campaignid=23480298474&gclid=CjwKCAjw6MPRBhBTEiwAd-7MryNvQezaLfCa_aoqc7_J_MQ6JsyL2t7buoCLxPUzcCqkVPxuaoamKBoCD5AQAvD_BwE&utm_content=b&utm_campaign=bc_search_leads_catalogo2026%2F01%2F21&gad_source=1&utm_medium=cpc&utm_term=russer",
+      logo: russerLogo.url,
     },
-    { name: "Endoctus", url: "https://doctus.med.br" },
+    { name: "Endoctus", url: "https://doctus.med.br", logo: endoctusLogo.url },
   ];
   return (
     <section className="bg-secondary/30">
@@ -315,9 +318,10 @@ function Partners() {
               href={b.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="grid h-24 place-items-center rounded-2xl border border-border bg-card text-lg font-bold tracking-tight text-primary shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-card)]"
+              aria-label={b.name}
+              className="grid h-24 place-items-center rounded-2xl border border-border bg-card px-6 shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-card)]"
             >
-              {b.name}
+              <img src={b.logo} alt={`Logo ${b.name}`} className="max-h-12 w-auto object-contain" />
             </a>
           ))}
           <div className="grid h-24 place-items-center rounded-2xl border border-dashed border-border bg-card/50 text-sm text-muted-foreground">
