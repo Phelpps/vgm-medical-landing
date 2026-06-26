@@ -112,12 +112,11 @@ function Hero() {
             <ShieldCheck className="h-3.5 w-3.5" /> Equipamentos médicos certificados
           </span>
           <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
-            Equipamentos e instrumentais médicos com{" "}
-            <span className="bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">precisão clínica</span>.
+            Equipamentos e instrumentais para{" "}
+            <span className="bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">videocirurgia</span> e linha convencional.
           </h1>
           <p className="mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
-            Há mais de 20 anos a VGM Medical fornece equipamentos e instrumentais cirúrgicos para hospitais, clínicas
-            e profissionais — com curadoria técnica, marcas reconhecidas e assistência técnica especializada.
+            A VGM Medical fornece equipamentos e instrumentais cirúrgicos para hospitais, clínicas e profissionais da saúde — com curadoria técnica, marcas reconhecidas e assistência técnica especializada.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
@@ -165,7 +164,7 @@ function Trust() {
   const items = [
     { icon: ShieldCheck, title: "Qualidade certificada", desc: "Equipamentos e instrumentais de marcas reconhecidas." },
     { icon: Wrench, title: "Assistência técnica", desc: "Suporte e manutenção especializada." },
-    { icon: Truck, title: "Entrega ágil", desc: "Logística rápida para todo o Brasil." },
+    { icon: Truck, title: "Entrega rápida", desc: "Logística para todo o Brasil." },
   ];
   return (
     <section className="border-y border-border/60 bg-secondary/40">
@@ -188,14 +187,13 @@ function Trust() {
 
 function Stats() {
   const stats = [
-    { icon: CalendarDays, n: "+20 anos", l: "de experiência" },
     { icon: Package, n: "+2000", l: "produtos no catálogo" },
     { icon: Wrench, n: "Assistência", l: "técnica especializada" },
     { icon: Award, n: "Marcas", l: "parceiras reconhecidas" },
   ];
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-3">
         {stats.map((s) => (
           <div key={s.l} className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)]">
             <s.icon className="h-6 w-6 text-primary" />
@@ -262,7 +260,7 @@ function Catalog() {
       <div className="mb-12 max-w-2xl">
         <span className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Catálogo</span>
         <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Equipamentos e instrumentais para cada necessidade.
+          Soluções integradas em videocirurgia e instrumentais convencionais.
         </h2>
         <p className="mt-3 text-muted-foreground">
           Conheça nossas categorias. Acesse o catálogo completo para ver todos os produtos.
@@ -345,7 +343,7 @@ function ServiceCTA() {
               Realizamos assistência técnica especializada.
             </h2>
             <p className="mt-3 max-w-2xl opacity-90">
-              Manutenção e suporte técnico para equipamentos médicos. Fale conosco para um orçamento.
+              Manutenção e suporte técnico para equipamentos médicos e instrumentais de videocirurgia. Fale conosco para um orçamento.
             </p>
           </div>
           <Link
