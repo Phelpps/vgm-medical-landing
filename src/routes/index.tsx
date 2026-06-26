@@ -101,12 +101,27 @@ function Index() {
   );
 }
 
+function useSiteSetting(key: string) {
+  const { data } = useQuery({
+    queryKey: ["site_setting", key],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("site_settings").select("value").eq("key", key).maybeSingle();
+      if (error) throw error;
+      return data?.value ?? null;
+    },
+  });
+  return data ?? null;
+}
+
 function Hero() {
+  const heroPath = useSiteSetting("hero_image_path");
+  const signed = useSignedImage(heroPath);
+  const heroSrc = signed ?? heroInstruments.url;
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 -z-10" style={{ background: "var(--gradient-hero)" }} />
       <div className="absolute inset-0 -z-10 opacity-70 [background-image:radial-gradient(circle_at_top_right,oklch(0.88_0.045_195/0.5),transparent_55%),radial-gradient(circle_at_bottom_left,oklch(0.28_0.025_200/0.18),transparent_55%)]" />
-      <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-12 lg:py-24">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1.2fr] lg:gap-14 lg:py-24">
         <div>
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white/70 px-3 py-1 text-xs font-semibold text-primary backdrop-blur">
             <ShieldCheck className="h-3.5 w-3.5" /> Equipamentos médicos certificados
@@ -144,11 +159,9 @@ function Hero() {
           <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-[image:var(--gradient-primary)] opacity-15 blur-2xl" />
           <div className="overflow-hidden rounded-3xl border border-white/60 bg-white shadow-[var(--shadow-card)]">
             <img
-              src={heroInstruments.url}
+              src={heroSrc}
               alt="Pinças e instrumentais cirúrgicos de precisão em ambiente estéril"
-              width={1536}
-              height={1024}
-              className="h-full w-full object-cover"
+              className="aspect-[4/3] h-full w-full object-cover lg:aspect-[5/4]"
             />
           </div>
           <div className="absolute -bottom-6 -left-6 hidden h-28 w-28 rounded-full border-4 border-white bg-white shadow-[var(--shadow-card)] sm:block">
