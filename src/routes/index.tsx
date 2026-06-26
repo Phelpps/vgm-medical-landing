@@ -302,15 +302,33 @@ function Catalog() {
   );
 }
 
+type Brand = { id: string; name: string; url: string; logo_url: string | null; sort_order: number };
+
+function BrandLogo({ brand }: { brand: Brand }) {
+  const signed = useSignedImage(brand.logo_url);
+  const fallback =
+    brand.name === "Russer" ? russerLogo.url : brand.name === "Endoctus" ? endoctusLogo.url : null;
+  const src = signed ?? fallback;
+  return src ? (
+    <img src={src} alt={`Logo ${brand.name}`} className="max-h-12 w-auto object-contain" />
+  ) : (
+    <span className="text-base font-bold tracking-tight text-foreground">{brand.name}</span>
+  );
+}
+
 function Partners() {
-  const brands: { name: string; url: string; logo: string }[] = [
-    {
-      name: "Russer",
-      url: "https://www.russer.com/?utm_source=google&gad_campaignid=23480298474&gclid=CjwKCAjw6MPRBhBTEiwAd-7MryNvQezaLfCa_aoqc7_J_MQ6JsyL2t7buoCLxPUzcCqkVPxuaoamKBoCD5AQAvD_BwE&utm_content=b&utm_campaign=bc_search_leads_catalogo2026%2F01%2F21&gad_source=1&utm_medium=cpc&utm_term=russer",
-      logo: russerLogo.url,
+  const { data: brands = [] } = useQuery({
+    queryKey: ["partner_brands"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("partner_brands")
+        .select("*")
+        .order("sort_order")
+        .order("name");
+      if (error) throw error;
+      return (data ?? []) as Brand[];
     },
-    { name: "Endoctus", url: "https://doctus.med.br", logo: endoctusLogo.url },
-  ];
+  });
   return (
     <section className="bg-secondary/30">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -324,18 +342,27 @@ function Partners() {
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {brands.map((b) => (
-            <a
-              key={b.name}
-              href={b.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={b.name}
-              className="grid h-24 place-items-center rounded-2xl border border-border bg-card px-6 shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-card)]"
-            >
-              <img src={b.logo} alt={`Logo ${b.name}`} className="max-h-12 w-auto object-contain" />
-            </a>
-          ))}
+          {brands.map((b) =>
+            b.url ? (
+              <a
+                key={b.id}
+                href={b.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={b.name}
+                className="grid h-24 place-items-center rounded-2xl border border-border bg-card px-6 shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-card)]"
+              >
+                <BrandLogo brand={b} />
+              </a>
+            ) : (
+              <div
+                key={b.id}
+                className="grid h-24 place-items-center rounded-2xl border border-border bg-card px-6 shadow-[var(--shadow-soft)]"
+              >
+                <BrandLogo brand={b} />
+              </div>
+            ),
+          )}
           <div className="grid h-24 place-items-center rounded-2xl border border-dashed border-border bg-card/50 text-sm text-muted-foreground">
             e outras
           </div>
