@@ -11,7 +11,6 @@ import {
   ImageOff,
   Wrench,
   Package,
-  CalendarDays,
 } from "lucide-react";
 import surgicalImage from "@/assets/surgical-room.jpg";
 import logo from "@/assets/vgm-logo-new.jpeg.asset.json";
@@ -101,23 +100,37 @@ function Index() {
   );
 }
 
+function useSiteSetting(key: string) {
+  const { data } = useQuery({
+    queryKey: ["site_setting", key],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("site_settings").select("value").eq("key", key).maybeSingle();
+      if (error) throw error;
+      return data?.value ?? null;
+    },
+  });
+  return data ?? null;
+}
+
 function Hero() {
+  const heroPath = useSiteSetting("hero_image_path");
+  const signed = useSignedImage(heroPath);
+  const heroSrc = signed ?? heroInstruments.url;
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 -z-10" style={{ background: "var(--gradient-hero)" }} />
       <div className="absolute inset-0 -z-10 opacity-70 [background-image:radial-gradient(circle_at_top_right,oklch(0.88_0.045_195/0.5),transparent_55%),radial-gradient(circle_at_bottom_left,oklch(0.28_0.025_200/0.18),transparent_55%)]" />
-      <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-12 lg:py-24">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1.2fr] lg:gap-14 lg:py-24">
         <div>
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white/70 px-3 py-1 text-xs font-semibold text-primary backdrop-blur">
             <ShieldCheck className="h-3.5 w-3.5" /> Equipamentos médicos certificados
           </span>
           <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
-            Equipamentos e instrumentais médicos com{" "}
-            <span className="bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">precisão clínica</span>.
+            Equipamentos e instrumentais para{" "}
+            <span className="bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">videocirurgia</span> e linha convencional.
           </h1>
           <p className="mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
-            Há mais de 20 anos a VGM Medical fornece equipamentos e instrumentais cirúrgicos para hospitais, clínicas
-            e profissionais — com curadoria técnica, marcas reconhecidas e assistência técnica especializada.
+            A VGM Medical fornece equipamentos e instrumentais cirúrgicos para hospitais, clínicas e profissionais da saúde — com curadoria técnica, marcas reconhecidas e assistência técnica especializada.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
@@ -145,11 +158,9 @@ function Hero() {
           <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-[image:var(--gradient-primary)] opacity-15 blur-2xl" />
           <div className="overflow-hidden rounded-3xl border border-white/60 bg-white shadow-[var(--shadow-card)]">
             <img
-              src={heroInstruments.url}
+              src={heroSrc}
               alt="Pinças e instrumentais cirúrgicos de precisão em ambiente estéril"
-              width={1536}
-              height={1024}
-              className="h-full w-full object-cover"
+              className="aspect-[4/3] h-full w-full object-cover lg:aspect-[5/4]"
             />
           </div>
           <div className="absolute -bottom-6 -left-6 hidden h-28 w-28 rounded-full border-4 border-white bg-white shadow-[var(--shadow-card)] sm:block">
@@ -165,7 +176,7 @@ function Trust() {
   const items = [
     { icon: ShieldCheck, title: "Qualidade certificada", desc: "Equipamentos e instrumentais de marcas reconhecidas." },
     { icon: Wrench, title: "Assistência técnica", desc: "Suporte e manutenção especializada." },
-    { icon: Truck, title: "Entrega ágil", desc: "Logística rápida para todo o Brasil." },
+    { icon: Truck, title: "Entrega rápida", desc: "Logística para todo o Brasil." },
   ];
   return (
     <section className="border-y border-border/60 bg-secondary/40">
@@ -188,14 +199,13 @@ function Trust() {
 
 function Stats() {
   const stats = [
-    { icon: CalendarDays, n: "+20 anos", l: "de experiência" },
     { icon: Package, n: "+2000", l: "produtos no catálogo" },
     { icon: Wrench, n: "Assistência", l: "técnica especializada" },
     { icon: Award, n: "Marcas", l: "parceiras reconhecidas" },
   ];
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-3">
         {stats.map((s) => (
           <div key={s.l} className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)]">
             <s.icon className="h-6 w-6 text-primary" />
@@ -262,7 +272,7 @@ function Catalog() {
       <div className="mb-12 max-w-2xl">
         <span className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Catálogo</span>
         <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Equipamentos e instrumentais para cada necessidade.
+          Soluções integradas em videocirurgia e instrumentais convencionais.
         </h2>
         <p className="mt-3 text-muted-foreground">
           Conheça nossas categorias. Acesse o catálogo completo para ver todos os produtos.
@@ -291,15 +301,33 @@ function Catalog() {
   );
 }
 
+type Brand = { id: string; name: string; url: string; logo_url: string | null; sort_order: number };
+
+function BrandLogo({ brand }: { brand: Brand }) {
+  const signed = useSignedImage(brand.logo_url);
+  const fallback =
+    brand.name === "Russer" ? russerLogo.url : brand.name === "Endoctus" ? endoctusLogo.url : null;
+  const src = signed ?? fallback;
+  return src ? (
+    <img src={src} alt={`Logo ${brand.name}`} className="max-h-12 w-auto object-contain" />
+  ) : (
+    <span className="text-base font-bold tracking-tight text-foreground">{brand.name}</span>
+  );
+}
+
 function Partners() {
-  const brands: { name: string; url: string; logo: string }[] = [
-    {
-      name: "Russer",
-      url: "https://www.russer.com/?utm_source=google&gad_campaignid=23480298474&gclid=CjwKCAjw6MPRBhBTEiwAd-7MryNvQezaLfCa_aoqc7_J_MQ6JsyL2t7buoCLxPUzcCqkVPxuaoamKBoCD5AQAvD_BwE&utm_content=b&utm_campaign=bc_search_leads_catalogo2026%2F01%2F21&gad_source=1&utm_medium=cpc&utm_term=russer",
-      logo: russerLogo.url,
+  const { data: brands = [] } = useQuery({
+    queryKey: ["partner_brands"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("partner_brands")
+        .select("*")
+        .order("sort_order")
+        .order("name");
+      if (error) throw error;
+      return (data ?? []) as Brand[];
     },
-    { name: "Endoctus", url: "https://doctus.med.br", logo: endoctusLogo.url },
-  ];
+  });
   return (
     <section className="bg-secondary/30">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -313,18 +341,27 @@ function Partners() {
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {brands.map((b) => (
-            <a
-              key={b.name}
-              href={b.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={b.name}
-              className="grid h-24 place-items-center rounded-2xl border border-border bg-card px-6 shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-card)]"
-            >
-              <img src={b.logo} alt={`Logo ${b.name}`} className="max-h-12 w-auto object-contain" />
-            </a>
-          ))}
+          {brands.map((b) =>
+            b.url ? (
+              <a
+                key={b.id}
+                href={b.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={b.name}
+                className="grid h-24 place-items-center rounded-2xl border border-border bg-card px-6 shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-card)]"
+              >
+                <BrandLogo brand={b} />
+              </a>
+            ) : (
+              <div
+                key={b.id}
+                className="grid h-24 place-items-center rounded-2xl border border-border bg-card px-6 shadow-[var(--shadow-soft)]"
+              >
+                <BrandLogo brand={b} />
+              </div>
+            ),
+          )}
           <div className="grid h-24 place-items-center rounded-2xl border border-dashed border-border bg-card/50 text-sm text-muted-foreground">
             e outras
           </div>
@@ -345,7 +382,7 @@ function ServiceCTA() {
               Realizamos assistência técnica especializada.
             </h2>
             <p className="mt-3 max-w-2xl opacity-90">
-              Manutenção e suporte técnico para equipamentos médicos. Fale conosco para um orçamento.
+              Manutenção e suporte técnico para equipamentos médicos e instrumentais de videocirurgia. Fale conosco para um orçamento.
             </p>
           </div>
           <Link
