@@ -18,6 +18,7 @@ type Product = {
   category: string;
   image_url: string | null;
   sort_order: number;
+  additional_info: string;
 };
 
 type Draft = {
@@ -27,10 +28,11 @@ type Draft = {
   category: string;
   image_url: string | null;
   sort_order: number;
+  additional_info: string;
   file?: File | null;
 };
 
-const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, sort_order: 0, file: null };
+const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, sort_order: 0, additional_info: "", file: null };
 
 function AdminPage() {
   const navigate = useNavigate();
@@ -120,6 +122,7 @@ function AdminPage() {
         category: d.category.trim() || "Geral",
         image_url,
         sort_order: d.sort_order,
+        additional_info: d.additional_info,
       };
       if (d.id) {
         const { error } = await supabase.from("products").update(payload).eq("id", d.id);
@@ -346,19 +349,28 @@ function ProductForm({
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </Field>
-        <Field label="Categoria">
+        <Field label="Especialidade">
           <input
             value={draft.category}
             onChange={(e) => onChange({ ...draft, category: e.target.value })}
-            placeholder="Ex.: Pinças Anatômicas"
+            placeholder="Ex.: Vídeo Nasofibroscópio"
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </Field>
-        <Field label="Descrição" full>
+        <Field label="Descrição curta" full>
           <textarea
             value={draft.description}
             onChange={(e) => onChange({ ...draft, description: e.target.value })}
             rows={2}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+        </Field>
+        <Field label="Informações adicionais (exibido na página do produto)" full>
+          <textarea
+            value={draft.additional_info}
+            onChange={(e) => onChange({ ...draft, additional_info: e.target.value })}
+            rows={6}
+            placeholder="Especificações técnicas, materiais, dimensões, indicações de uso, garantia, etc."
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </Field>
