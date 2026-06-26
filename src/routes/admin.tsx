@@ -572,3 +572,266 @@ function ChangePasswordForm({ onClose }: { onClose: () => void }) {
   );
 }
 
+function useSignedThumb(path: string | null) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    if (!path) { setUrl(null); return; }
+    supabase.storage.from("product-images").createSignedUrl(path, 3600).then(({ data }) => {
+      if (!cancelled) setUrl(data?.signedUrl ?? null);
+    });
+    return () => { cancelled = true; };
+  }, [path]);
+  return url;
+}
+
+function HeroImageManager() {
+  const qc = useQueryClient();
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const { data: setting } = useQuery({
+    queryKey: ["site_setting", "hero_image_path"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_settings").select("value").eq("key", "hero_image_path").maybeSingle();
+      if (error) throw error;
+      return data?.value ?? null;
+    },
+  });
+
+  const preview = useSignedThumb(setting ?? null);
+
+  async function handleUpload(file: File) {
+    setErr(null);
+    setBusy(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `_hero/${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("product-images").upload(path, file, { contentType: file.type });
+      if (upErr) throw upErr;
+      if (setting) {
+        await supabase.storage.from("product-images").remove([setting]);
+      }
+      const { error } = await supabase
+        .from("site_settings")
+        .upsert({ key: "hero_image_path", value: path }, { onConflict: "key" });
+      if (error) throw error;
+      qc.invalidateQueries({ queryKey: ["site_setting", "hero_image_path"] });
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Erro ao enviar imagem.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="mb-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
+      <div className="mb-3 flex items-center gap-2">
+        <ImageIcon className="h-4 w-4 text-primary" />
+        <h2 className="text-base font-bold">Imagem principal (Hero da página inicial)</h2>
+      </div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="grid h-28 w-44 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-white">
+          {preview ? (
+            <img src={preview} alt="Hero atual" className="h-full w-full object-cover" />
+          ) : (
+            <span className="px-3 text-center text-xs text-muted-foreground">Usando imagem padrão</span>
+          )}
+        </div>
+        <div className="flex-1">
+          <p className="text-sm text-muted-foreground">
+            Envie uma imagem (jpg/png) para destacar no topo da página inicial. Recomendado: 1600×1200 px.
+          </p>
+          <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-5 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:opacity-90">
+            <Upload className="h-4 w-4" /> {busy ? "Enviando…" : "Selecionar nova imagem"}
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              disabled={busy}
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(f); e.target.value = ""; }}
+            />
+          </label>
+          {err && <p className="mt-2 text-sm text-destructive">{err}</p>}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+type BrandRow = { id: string; name: string; url: string; logo_url: string | null; sort_order: number };
+type BrandDraft = { id?: string; name: string; url: string; sort_order: number; logo_url: string | null; file: File | null };
+
+function PartnerBrandsManager() {
+  const qc = useQueryClient();
+  const [draft, setDraft] = useState<BrandDraft | null>(null);
+
+  const { data: brands = [] } = useQuery({
+    queryKey: ["admin-brands"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("partner_brands").select("*").order("sort_order").order("name");
+      if (error) throw error;
+      return (data ?? []) as BrandRow[];
+    },
+  });
+
+  const save = useMutation({
+    mutationFn: async (d: BrandDraft) => {
+      let logo_url = d.logo_url;
+      if (d.file) {
+        const ext = d.file.name.split(".").pop() || "png";
+        const path = `_brands/${crypto.randomUUID()}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("product-images").upload(path, d.file, { contentType: d.file.type });
+        if (upErr) throw upErr;
+        logo_url = path;
+      }
+      const payload = { name: d.name.trim(), url: d.url.trim(), sort_order: d.sort_order, logo_url };
+      if (d.id) {
+        const { error } = await supabase.from("partner_brands").update(payload).eq("id", d.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("partner_brands").insert(payload);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-brands"] });
+      qc.invalidateQueries({ queryKey: ["partner_brands"] });
+      setDraft(null);
+    },
+  });
+
+  const del = useMutation({
+    mutationFn: async (b: BrandRow) => {
+      if (b.logo_url) await supabase.storage.from("product-images").remove([b.logo_url]);
+      const { error } = await supabase.from("partner_brands").delete().eq("id", b.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-brands"] });
+      qc.invalidateQueries({ queryKey: ["partner_brands"] });
+    },
+  });
+
+  return (
+    <section className="mb-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Building2 className="h-4 w-4 text-primary" />
+          <h2 className="text-base font-bold">Marcas parceiras</h2>
+        </div>
+        <button
+          onClick={() => setDraft({ name: "", url: "", sort_order: brands.length + 1, logo_url: null, file: null })}
+          className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:opacity-90"
+        >
+          <Plus className="h-4 w-4" /> Nova marca
+        </button>
+      </div>
+
+      {draft && (
+        <BrandForm
+          draft={draft}
+          onChange={setDraft}
+          onCancel={() => setDraft(null)}
+          onSave={() => save.mutate(draft)}
+          saving={save.isPending}
+          error={save.error?.message}
+        />
+      )}
+
+      <ul className="mt-3 divide-y divide-border overflow-hidden rounded-xl border border-border">
+        {brands.length === 0 && (
+          <li className="bg-card p-5 text-center text-sm text-muted-foreground">Nenhuma marca cadastrada.</li>
+        )}
+        {brands.map((b) => (
+          <BrandRowItem
+            key={b.id}
+            brand={b}
+            onEdit={() => setDraft({ ...b, file: null })}
+            onDelete={() => { if (confirm(`Excluir "${b.name}"?`)) del.mutate(b); }}
+          />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function BrandRowItem({ brand, onEdit, onDelete }: { brand: BrandRow; onEdit: () => void; onDelete: () => void }) {
+  const url = useSignedThumb(brand.logo_url);
+  return (
+    <li className="flex items-center gap-4 bg-card px-4 py-3">
+      <div className="grid h-12 w-20 shrink-0 place-items-center overflow-hidden rounded-md border border-border bg-white">
+        {url ? <img src={url} alt="" className="h-full w-full object-contain p-1" /> : <ImageOff className="h-4 w-4 text-muted-foreground" />}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-sm font-semibold">{brand.name}</div>
+        <div className="truncate text-xs text-muted-foreground">{brand.url || "(sem link)"}</div>
+      </div>
+      <button onClick={onEdit} className="rounded-md p-2 text-muted-foreground hover:bg-secondary hover:text-foreground"><Pencil className="h-4 w-4" /></button>
+      <button onClick={onDelete} className="rounded-md p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
+    </li>
+  );
+}
+
+function BrandForm({
+  draft, onChange, onCancel, onSave, saving, error,
+}: {
+  draft: BrandDraft;
+  onChange: (d: BrandDraft) => void;
+  onCancel: () => void;
+  onSave: () => void;
+  saving: boolean;
+  error?: string;
+}) {
+  const [preview, setPreview] = useState<string | null>(null);
+  useEffect(() => {
+    if (!draft.file) { setPreview(null); return; }
+    const u = URL.createObjectURL(draft.file);
+    setPreview(u);
+    return () => URL.revokeObjectURL(u);
+  }, [draft.file]);
+
+  return (
+    <div className="mb-3 rounded-xl border border-border bg-background p-4">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Field label="Nome">
+          <input value={draft.name} onChange={(e) => onChange({ ...draft, name: e.target.value })}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+        </Field>
+        <Field label="Link (URL)">
+          <input value={draft.url} onChange={(e) => onChange({ ...draft, url: e.target.value })} placeholder="https://"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+        </Field>
+        <Field label="Ordem">
+          <input type="number" value={draft.sort_order} onChange={(e) => onChange({ ...draft, sort_order: Number(e.target.value) || 0 })}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+        </Field>
+        <Field label="Logo">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border bg-background px-3 py-2 text-sm hover:bg-secondary">
+            <Upload className="h-4 w-4" />
+            {draft.file ? draft.file.name : draft.logo_url ? "Substituir logo" : "Selecionar logo"}
+            <input type="file" accept="image/*" className="hidden"
+              onChange={(e) => onChange({ ...draft, file: e.target.files?.[0] ?? null })} />
+          </label>
+          {preview && <img src={preview} alt="" className="mt-2 h-16 rounded-md border border-border object-contain" />}
+        </Field>
+      </div>
+      {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
+      <div className="mt-4 flex justify-end gap-2">
+        <button onClick={onCancel} className="rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold hover:bg-secondary">
+          Cancelar
+        </button>
+        <button onClick={onSave} disabled={saving || !draft.name.trim()}
+          className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-5 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:opacity-90 disabled:opacity-50">
+          <Save className="h-4 w-4" /> {saving ? "Salvando…" : "Salvar"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
