@@ -221,9 +221,9 @@ function CatalogPage() {
 
       <section className="border-b border-border/60 bg-[image:var(--gradient-hero)]">
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
-          <span className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Catálogo completo</span>
+          <span className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Catálogo</span>
           <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
-            Nossa linha de pinças médicas
+            Catálogo completo
           </h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">
             Clique no nome do produto para visualizar a imagem. Solicite orçamento direto pelo WhatsApp.

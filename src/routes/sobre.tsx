@@ -26,20 +26,17 @@ function SobrePage() {
           <div>
             <span className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Sobre nós</span>
             <h1 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">
-              Equipamentos médicos com a experiência de quem entende do assunto.
+              Excelência e inovação em equipamentos e instrumentais para videocirurgia e soluções médicas hospitalares.
             </h1>
             <p className="mt-5 text-muted-foreground">
-              A <strong className="text-foreground">VGM Medical</strong> atua há mais de 20 anos no fornecimento de
-              equipamentos e instrumentais cirúrgicos para hospitais, clínicas e profissionais autônomos. Trabalhamos
-              com curadoria técnica, marcas reconhecidas e assistência técnica especializada para garantir a sua
-              tranquilidade em cada procedimento.
+              A <strong className="text-foreground">VGM Medical</strong> atua de forma consolidada no fornecimento de equipamentos médicos e instrumentais para videocirurgia, atendendo a médicos, hospitais e clínicas. Trabalhamos exclusivamente com marcas reconhecidas e assistência técnica especializada. Nossa missão é assegurar precisão, inovação e total segurança em procedimentos minimamente invasivos.
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
               {[
-                { icon: Award, n: "+20 anos", l: "de experiência no setor" },
                 { icon: Users, n: "+2000", l: "produtos no catálogo" },
                 { icon: Wrench, n: "Assistência", l: "técnica especializada" },
                 { icon: Truck, n: "Logística", l: "rápida para todo o Brasil" },
+                { icon: Award, n: "Marcas", l: "parceiras reconhecidas" },
               ].map((s) => (
                 <div key={s.l} className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
                   <s.icon className="h-5 w-5 text-primary" />
@@ -61,7 +58,7 @@ function SobrePage() {
                   "Atendimento humano e consultivo.",
                   "Assistência técnica especializada.",
                   "Marcas reconhecidas e parceiras.",
-                  "Suporte pós-venda dedicado.",
+                  "Suporte pós-venda",
                 ].map((t) => (
                   <li key={t} className="flex items-start gap-3">
                     <div className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[image:var(--gradient-primary)] text-primary-foreground">
