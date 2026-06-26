@@ -237,6 +237,10 @@ function AdminPage() {
           <ChangePasswordForm onClose={() => setShowChangePassword(false)} />
         )}
 
+        <HeroImageManager />
+        <PartnerBrandsManager />
+
+
         {showNewUser && (
           <NewAdminForm
             onClose={() => setShowNewUser(false)}
