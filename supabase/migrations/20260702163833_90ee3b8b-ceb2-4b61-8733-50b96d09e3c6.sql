@@ -1,0 +1,1 @@
+INSERT INTO public.site_settings (key, value) VALUES ('hero_image_paths', '["_hero/gin1.png","_hero/uro1.png","_hero/lap1.png","_hero/gin2.png","_hero/uro2.png","_hero/lap2.png"]') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
