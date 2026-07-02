@@ -114,7 +114,6 @@ function Index() {
       <SiteHeader />
       <main>
         <Hero />
-        <LogoBanner />
         <Trust />
         <Stats />
         <Catalog />
