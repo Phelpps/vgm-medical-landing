@@ -175,16 +175,16 @@ function Hero() {
       <div className="absolute inset-0 -z-10 opacity-70 [background-image:radial-gradient(circle_at_top_right,oklch(0.88_0.045_195/0.5),transparent_55%),radial-gradient(circle_at_bottom_left,oklch(0.28_0.025_200/0.18),transparent_55%)]" />
 
       {/* Full-width image carousel */}
-      <div className="relative h-[55vh] min-h-[420px] w-full sm:h-[60vh] sm:min-h-[500px]">
+      <div className="relative h-[55vh] min-h-[420px] w-full bg-white sm:h-[60vh] sm:min-h-[500px]">
         {slides.map((src, i) => (
           <img
             key={src + i}
             src={src}
             alt="Equipamentos e instrumentais cirúrgicos VGM Medical"
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${i === idx ? "opacity-100" : "opacity-0"}`}
+            className={`absolute inset-0 h-full w-full object-contain object-right p-4 transition-opacity duration-1000 sm:object-right sm:p-8 ${i === idx ? "opacity-100" : "opacity-0"}`}
           />
         ))}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-transparent" />
       </div>
 
       {/* Text overlay */}
