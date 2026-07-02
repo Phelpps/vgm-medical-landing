@@ -597,42 +597,99 @@ function useSignedThumb(path: string | null) {
   return url;
 }
 
+function parseHeroPaths(value: string | null): string[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) return parsed.filter((v) => typeof v === "string");
+  } catch {
+    return [value];
+  }
+  return [];
+}
+
+function HeroThumb({ path, onRemove, busy }: { path: string; onRemove: () => void; busy: boolean }) {
+  const url = useSignedThumb(path);
+  return (
+    <div className="relative h-24 w-40 shrink-0 overflow-hidden rounded-lg border border-border bg-white">
+      {url ? (
+        <img src={url} alt="Hero" className="h-full w-full object-cover" />
+      ) : (
+        <div className="grid h-full w-full place-items-center text-xs text-muted-foreground">…</div>
+      )}
+      <button
+        type="button"
+        onClick={onRemove}
+        disabled={busy}
+        className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-black/60 text-white hover:bg-black/80 disabled:opacity-50"
+        aria-label="Remover imagem"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+}
+
 function HeroImageManager() {
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   const { data: setting } = useQuery({
-    queryKey: ["site_setting", "hero_image_path"],
+    queryKey: ["site_setting", "hero_image_paths"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("site_settings").select("value").eq("key", "hero_image_path").maybeSingle();
+        .from("site_settings")
+        .select("key,value")
+        .in("key", ["hero_image_paths", "hero_image_path"]);
       if (error) throw error;
-      return data?.value ?? null;
+      const rows = (data ?? []) as { key: string; value: string | null }[];
+      const multi = rows.find((r) => r.key === "hero_image_paths");
+      const legacy = rows.find((r) => r.key === "hero_image_path");
+      return (multi ?? legacy)?.value ?? null;
     },
   });
 
-  const preview = useSignedThumb(setting ?? null);
+  const paths = parseHeroPaths(setting ?? null);
 
-  async function handleUpload(file: File) {
+  async function persist(next: string[]) {
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert({ key: "hero_image_paths", value: JSON.stringify(next) }, { onConflict: "key" });
+    if (error) throw error;
+    qc.invalidateQueries({ queryKey: ["site_setting", "hero_image_paths"] });
+    qc.invalidateQueries({ queryKey: ["site_setting", "hero_image_path"] });
+  }
+
+  async function handleUpload(files: FileList) {
     setErr(null);
     setBusy(true);
     try {
-      const ext = file.name.split(".").pop() || "jpg";
-      const path = `_hero/${crypto.randomUUID()}.${ext}`;
-      const { error: upErr } = await supabase.storage
-        .from("product-images").upload(path, file, { contentType: file.type });
-      if (upErr) throw upErr;
-      if (setting) {
-        await supabase.storage.from("product-images").remove([setting]);
+      const uploaded: string[] = [];
+      for (const file of Array.from(files)) {
+        const ext = file.name.split(".").pop() || "jpg";
+        const path = `_hero/${crypto.randomUUID()}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("product-images").upload(path, file, { contentType: file.type });
+        if (upErr) throw upErr;
+        uploaded.push(path);
       }
-      const { error } = await supabase
-        .from("site_settings")
-        .upsert({ key: "hero_image_path", value: path }, { onConflict: "key" });
-      if (error) throw error;
-      qc.invalidateQueries({ queryKey: ["site_setting", "hero_image_path"] });
+      await persist([...paths, ...uploaded]);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Erro ao enviar imagem.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleRemove(path: string) {
+    setErr(null);
+    setBusy(true);
+    try {
+      await supabase.storage.from("product-images").remove([path]);
+      await persist(paths.filter((p) => p !== path));
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Erro ao remover imagem.");
     } finally {
       setBusy(false);
     }
@@ -644,34 +701,36 @@ function HeroImageManager() {
         <ImageIcon className="h-4 w-4 text-primary" />
         <h2 className="text-base font-bold">Imagem principal (Hero da página inicial)</h2>
       </div>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        <div className="grid h-28 w-44 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-white">
-          {preview ? (
-            <img src={preview} alt="Hero atual" className="h-full w-full object-cover" />
-          ) : (
-            <span className="px-3 text-center text-xs text-muted-foreground">Usando imagem padrão</span>
-          )}
-        </div>
-        <div className="flex-1">
-          <p className="text-sm text-muted-foreground">
-            Envie uma imagem (jpg/png) para destacar no topo da página inicial. Recomendado: 1600×1200 px.
-          </p>
-          <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-5 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:opacity-90">
-            <Upload className="h-4 w-4" /> {busy ? "Enviando…" : "Selecionar nova imagem"}
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              disabled={busy}
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(f); e.target.value = ""; }}
-            />
-          </label>
-          {err && <p className="mt-2 text-sm text-destructive">{err}</p>}
-        </div>
+      <p className="text-sm text-muted-foreground">
+        Envie uma ou mais imagens (jpg/png) para o carrossel do topo da página inicial. Formato horizontal recomendado: 1600×900 px. As imagens se alternam automaticamente a cada 15 segundos.
+      </p>
+      <div className="mt-4 flex flex-wrap gap-3">
+        {paths.length === 0 ? (
+          <div className="grid h-24 w-40 place-items-center rounded-lg border border-dashed border-border bg-white/60 px-3 text-center text-xs text-muted-foreground">
+            Usando imagem padrão
+          </div>
+        ) : (
+          paths.map((p) => (
+            <HeroThumb key={p} path={p} busy={busy} onRemove={() => handleRemove(p)} />
+          ))
+        )}
       </div>
+      <label className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-5 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:opacity-90">
+        <Upload className="h-4 w-4" /> {busy ? "Enviando…" : "Adicionar imagens"}
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          disabled={busy}
+          onChange={(e) => { const f = e.target.files; if (f && f.length) handleUpload(f); e.target.value = ""; }}
+        />
+      </label>
+      {err && <p className="mt-2 text-sm text-destructive">{err}</p>}
     </section>
   );
 }
+
 
 type BrandRow = { id: string; name: string; url: string; logo_url: string | null; sort_order: number };
 type BrandDraft = { id?: string; name: string; url: string; sort_order: number; logo_url: string | null; file: File | null };
