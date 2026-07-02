@@ -130,7 +130,7 @@ function Hero() {
             <span className="bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">videocirurgia</span> e linha convencional.
           </h1>
           <p className="mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
-            A VGM Medical fornece equipamentos e instrumentais cirúrgicos para hospitais, clínicas e profissionais da saúde — com curadoria técnica, marcas reconhecidas e assistência técnica especializada.
+            A VGM Medical fornece equipamentos e instrumentais cirúrgicos para hospitais, clínicas e profissionais da saúde, marcas reconhecidas e assistência técnica especializada.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
