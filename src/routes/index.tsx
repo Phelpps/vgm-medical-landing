@@ -114,6 +114,7 @@ function Index() {
       <SiteHeader />
       <main>
         <Hero />
+        <LogoBanner />
         <Trust />
         <Stats />
         <Catalog />
@@ -243,6 +244,23 @@ function Hero() {
   );
 }
 
+
+function LogoBanner() {
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+      <div className="flex flex-col items-center justify-center">
+        <img
+          src={logo.url}
+          alt="VGM Medical"
+          className="h-auto w-full max-w-[480px] object-contain sm:max-w-[580px] lg:max-w-[680px]"
+        />
+        <p className="mt-6 text-center text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+          Excelência e inovação em equipamentos e instrumentais para videocirurgia.
+        </p>
+      </div>
+    </section>
+  );
+}
 
 function Trust() {
   const items = [
