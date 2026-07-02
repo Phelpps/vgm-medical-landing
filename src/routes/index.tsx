@@ -223,6 +223,13 @@ function Hero() {
                 </div>
               ))}
             </div>
+            <div className="hidden lg:flex items-center justify-center pl-8">
+              <img
+                src={logo.url}
+                alt="VGM Medical"
+                className="h-auto max-h-[260px] w-auto rounded-2xl object-contain drop-shadow-2xl"
+              />
+            </div>
           </div>
         </div>
       </div>
