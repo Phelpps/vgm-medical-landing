@@ -125,22 +125,50 @@ function Index() {
   );
 }
 
-function useSiteSetting(key: string) {
+function useHeroPaths(): string[] {
   const { data } = useQuery({
-    queryKey: ["site_setting", key],
+    queryKey: ["site_setting", "hero_image_paths_combined"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("site_settings").select("value").eq("key", key).maybeSingle();
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("key,value")
+        .in("key", ["hero_image_paths", "hero_image_path"]);
       if (error) throw error;
-      return data?.value ?? null;
+      const rows = (data ?? []) as { key: string; value: string | null }[];
+      const multi = rows.find((r) => r.key === "hero_image_paths")?.value ?? null;
+      if (multi) {
+        try {
+          const parsed = JSON.parse(multi);
+          if (Array.isArray(parsed)) return parsed.filter((v): v is string => typeof v === "string");
+        } catch {
+          return [multi];
+        }
+      }
+      const legacy = rows.find((r) => r.key === "hero_image_path")?.value ?? null;
+      return legacy ? [legacy] : [];
     },
   });
-  return data ?? null;
+  return data ?? [];
 }
 
 function Hero() {
-  const heroPath = useSiteSetting("hero_image_path");
-  const signed = useSignedImage(heroPath);
-  const heroSrc = signed ?? heroInstruments.url;
+  const paths = useHeroPaths();
+  const signedUrls = useSignedImages(paths);
+  const slides = signedUrls.length > 0 ? signedUrls : [heroInstruments.url];
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const id = window.setInterval(() => {
+      setIdx((i) => (i + 1) % slides.length);
+    }, 15000);
+    return () => window.clearInterval(id);
+  }, [slides.length]);
+
+  useEffect(() => {
+    setIdx(0);
+  }, [slides.length]);
+
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 -z-10" style={{ background: "var(--gradient-hero)" }} />
@@ -181,12 +209,28 @@ function Hero() {
         </div>
         <div className="relative">
           <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-[image:var(--gradient-primary)] opacity-15 blur-2xl" />
-          <div className="overflow-hidden rounded-3xl border border-white/60 bg-white shadow-[var(--shadow-card)]">
-            <img
-              src={heroSrc}
-              alt="Pinças e instrumentais cirúrgicos de precisão em ambiente estéril"
-              className="aspect-[4/3] h-full w-full object-cover lg:aspect-[5/4]"
-            />
+          <div className="relative aspect-video overflow-hidden rounded-3xl border border-white/60 bg-white shadow-[var(--shadow-card)]">
+            {slides.map((src, i) => (
+              <img
+                key={src + i}
+                src={src}
+                alt="Equipamentos e instrumentais cirúrgicos VGM Medical"
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${i === idx ? "opacity-100" : "opacity-0"}`}
+              />
+            ))}
+            {slides.length > 1 && (
+              <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+                {slides.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    aria-label={`Ir para imagem ${i + 1}`}
+                    onClick={() => setIdx(i)}
+                    className={`h-2 rounded-full transition-all ${i === idx ? "w-6 bg-white" : "w-2 bg-white/60 hover:bg-white/80"}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
           <div className="absolute -bottom-6 -left-6 hidden h-28 w-28 rounded-full border-4 border-white bg-white shadow-[var(--shadow-card)] sm:block">
             <img src={logo.url} alt="VGM Medical" className="h-full w-full rounded-full object-cover" />
@@ -196,6 +240,7 @@ function Hero() {
     </section>
   );
 }
+
 
 function Trust() {
   const items = [
