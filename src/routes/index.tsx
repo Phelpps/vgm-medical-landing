@@ -83,6 +83,31 @@ function useSignedImage(path: string | null) {
   return url;
 }
 
+function useSignedImages(paths: string[]) {
+  const key = paths.join("|");
+  const [urls, setUrls] = useState<string[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    if (paths.length === 0) {
+      setUrls([]);
+      return;
+    }
+    Promise.all(
+      paths.map((p) =>
+        supabase.storage.from("product-images").createSignedUrl(p, 60 * 60).then(({ data }) => data?.signedUrl ?? null),
+      ),
+    ).then((results) => {
+      if (!cancelled) setUrls(results.filter((u): u is string => !!u));
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  return urls;
+}
+
+
 function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
