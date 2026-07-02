@@ -173,70 +173,72 @@ function Hero() {
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 -z-10" style={{ background: "var(--gradient-hero)" }} />
       <div className="absolute inset-0 -z-10 opacity-70 [background-image:radial-gradient(circle_at_top_right,oklch(0.88_0.045_195/0.5),transparent_55%),radial-gradient(circle_at_bottom_left,oklch(0.28_0.025_200/0.18),transparent_55%)]" />
-      <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1.2fr] lg:gap-14 lg:py-24">
-        <div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white/70 px-3 py-1 text-xs font-semibold text-primary backdrop-blur">
-            <ShieldCheck className="h-3.5 w-3.5" /> Equipamentos médicos certificados
-          </span>
-          <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
-            Equipamentos e instrumentais para{" "}
-            <span className="bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">videocirurgia</span> e linha convencional.
-          </h1>
-          <p className="mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
-            A VGM Medical fornece equipamentos e instrumentais cirúrgicos para hospitais, clínicas e profissionais da saúde, marcas reconhecidas e assistência técnica especializada.
-          </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link
-              to="/catalogo"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:scale-[1.02]"
-            >
-              Ver catálogo <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              to="/contato"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white/80 px-7 py-3.5 text-sm font-semibold text-foreground backdrop-blur transition hover:bg-white"
-            >
-              Falar com a equipe
-            </Link>
-          </div>
-          <div className="mt-8 flex flex-wrap gap-6 text-sm text-muted-foreground">
-            {["Marcas parceiras", "Assistência técnica", "Entrega para todo Brasil"].map((t) => (
-              <div key={t} className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-primary" /> {t}
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="relative">
-          <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-[image:var(--gradient-primary)] opacity-15 blur-2xl" />
-          <div className="relative aspect-video overflow-hidden rounded-3xl border border-white/60 bg-white shadow-[var(--shadow-card)]">
-            {slides.map((src, i) => (
-              <img
-                key={src + i}
-                src={src}
-                alt="Equipamentos e instrumentais cirúrgicos VGM Medical"
-                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${i === idx ? "opacity-100" : "opacity-0"}`}
-              />
-            ))}
-            {slides.length > 1 && (
-              <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-                {slides.map((_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    aria-label={`Ir para imagem ${i + 1}`}
-                    onClick={() => setIdx(i)}
-                    className={`h-2 rounded-full transition-all ${i === idx ? "w-6 bg-white" : "w-2 bg-white/60 hover:bg-white/80"}`}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="absolute -bottom-6 -left-6 hidden h-28 w-28 rounded-full border-4 border-white bg-white shadow-[var(--shadow-card)] sm:block">
-            <img src={logo.url} alt="VGM Medical" className="h-full w-full rounded-full object-cover" />
+
+      {/* Full-width image carousel */}
+      <div className="relative h-[55vh] min-h-[420px] w-full sm:h-[60vh] sm:min-h-[500px]">
+        {slides.map((src, i) => (
+          <img
+            key={src + i}
+            src={src}
+            alt="Equipamentos e instrumentais cirúrgicos VGM Medical"
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${i === idx ? "opacity-100" : "opacity-0"}`}
+          />
+        ))}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-transparent" />
+      </div>
+
+      {/* Text overlay */}
+      <div className="absolute inset-0 flex items-center">
+        <div className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:py-24">
+          <div className="max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
+              <ShieldCheck className="h-3.5 w-3.5" /> Equipamentos médicos certificados
+            </span>
+            <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Equipamentos e instrumentais para{" "}
+              <span className="bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">videocirurgia</span> e linha convencional.
+            </h1>
+            <p className="mt-5 max-w-xl text-base text-white/90 sm:text-lg">
+              A VGM Medical fornece equipamentos e instrumentais cirúrgicos para hospitais, clínicas e profissionais da saúde, marcas reconhecidas e assistência técnica especializada.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                to="/catalogo"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:scale-[1.02]"
+              >
+                Ver catálogo <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/contato"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-white/20 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/30"
+              >
+                Falar com a equipe
+              </Link>
+            </div>
+            <div className="mt-8 flex flex-wrap gap-6 text-sm text-white/80">
+              {["Marcas parceiras", "Assistência técnica", "Entrega para todo Brasil"].map((t) => (
+                <div key={t} className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-primary" /> {t}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
+
+      {slides.length > 1 && (
+        <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-1.5">
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              aria-label={`Ir para imagem ${i + 1}`}
+              onClick={() => setIdx(i)}
+              className={`h-2 rounded-full transition-all ${i === idx ? "w-6 bg-white" : "w-2 bg-white/60 hover:bg-white/80"}`}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
