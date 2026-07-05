@@ -231,7 +231,7 @@ function Hero() {
         <img
           src={logo.url}
           alt="VGM Medical"
-          className="h-auto w-full max-w-[180px] rounded-2xl object-contain drop-shadow-2xl sm:max-w-[240px] lg:max-w-[280px]"
+          className="h-auto w-full max-w-[180px] rounded-full object-contain drop-shadow-2xl sm:max-w-[240px] lg:max-w-[280px]"
         />
       </div>
 
