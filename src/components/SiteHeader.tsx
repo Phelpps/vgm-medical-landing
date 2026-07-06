@@ -18,14 +18,14 @@ export function SiteHeader() {
   ] as const;
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
         <Link to="/" className="flex items-center gap-3">
           <img
             src={logo.url}
             alt="VGM Medical"
-            width={48}
-            height={48}
-            className="h-12 w-12 rounded-full object-cover shadow-[var(--shadow-soft)]"
+            width={56}
+            height={56}
+            className="h-14 w-14 rounded-full object-cover shadow-[var(--shadow-soft)]"
           />
           <div className="leading-tight">
             <div className="text-sm font-bold tracking-tight">VGM Medical</div>
