@@ -226,12 +226,12 @@ function Hero() {
         </div>
       </div>
 
-      {/* Logo positioned at bottom-right of hero — hidden on mobile to avoid covering CTAs */}
-      <div className="absolute bottom-4 right-4 z-10 hidden md:block lg:bottom-10 lg:right-8">
+      {/* Logo positioned at bottom-right of hero — hidden on mobile/tablet to avoid covering CTAs */}
+      <div className="absolute bottom-4 right-4 z-10 hidden lg:block lg:bottom-10 lg:right-8">
         <img
           src={logo.url}
           alt="VGM Medical"
-          className="h-auto w-full max-w-[140px] rounded-full object-contain drop-shadow-2xl md:max-w-[200px] lg:max-w-[280px]"
+          className="h-auto w-full max-w-[140px] rounded-full object-contain drop-shadow-2xl lg:max-w-[280px]"
         />
       </div>
 
