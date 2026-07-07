@@ -191,9 +191,6 @@ function Hero() {
       <div className="absolute inset-0 flex items-center">
         <div className="mx-auto flex w-full max-w-7xl items-center px-4 py-16 sm:px-6 lg:py-24">
           <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
-              <ShieldCheck className="h-3.5 w-3.5" /> Equipamentos médicos certificados
-            </span>
             <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
               Equipamentos e instrumentais para{" "}
               <span className="bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">videocirurgia</span> e linha convencional.
