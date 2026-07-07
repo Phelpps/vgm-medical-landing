@@ -169,9 +169,9 @@ function CatalogPage() {
 
       <section className="border-b border-border/60 bg-[image:var(--gradient-hero)]">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:py-14">
-          <span className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Catálogo</span>
+          <span className="text-xs font-bold uppercase tracking-[0.18em] text-primary"></span>
           <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
-            Produtos VGM
+            CATÁLOGO
           </h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">
             Escolha uma especialidade ao lado para explorar os produtos. Clique no item para ver detalhes.
