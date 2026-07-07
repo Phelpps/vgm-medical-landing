@@ -353,7 +353,7 @@ function Catalog() {
           Soluções integradas em videocirurgia e instrumentais convencionais.
         </h2>
         <p className="mt-3 text-muted-foreground">
-          Conheça nossas categorias. Acesse o catálogo completo para ver todos os produtos.
+          Conheça nossas especialidades. Acesse o catálogo completo para ver todos os produtos.
         </p>
       </div>
       {isLoading ? (
