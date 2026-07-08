@@ -44,6 +44,8 @@ function AdminPage() {
   const [signedThumbs, setSignedThumbs] = useState<Record<string, string>>({});
   const [showNewUser, setShowNewUser] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState("");
   const createUser = useServerFn(createAdminUser);
 
   useEffect(() => {
@@ -263,45 +265,83 @@ function AdminPage() {
           />
         )}
 
-        <ul className="mt-6 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
-          {products.length === 0 && (
-            <li className="p-8 text-center text-muted-foreground">Nenhum produto cadastrado.</li>
-          )}
-          {products.map((p) => (
-            <li key={p.id} className="flex items-center gap-4 px-4 py-3">
-              <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-white">
-                {p.image_url && signedThumbs[p.image_url] ? (
-                  <img src={signedThumbs[p.image_url]} alt="" className="h-full w-full object-contain" />
-                ) : (
-                  <ImageOff className="h-5 w-5 text-muted-foreground" />
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-sm font-semibold">{p.name}</div>
-                <div className="truncate text-xs text-muted-foreground">
-                  {p.category}
-                  {p.description ? ` · ${p.description}` : ""}
+        {(() => {
+          const categories = Array.from(new Set(products.map((p) => p.category).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+          const term = searchTerm.trim().toLowerCase();
+          const filtered = products.filter((p) => {
+            if (filterCategory !== "all" && p.category !== filterCategory) return false;
+            if (term && !(`${p.name} ${p.description} ${p.category}`.toLowerCase().includes(term))) return false;
+            return true;
+          });
+          return (
+            <>
+              <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-soft)] sm:flex-row sm:items-center">
+                <input
+                  type="search"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Buscar por nome, descrição ou especialidade…"
+                  className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+                <select
+                  value={filterCategory}
+                  onChange={(e) => setFilterCategory(e.target.value)}
+                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                >
+                  <option value="all">Todas as especialidades</option>
+                  {categories.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                <div className="text-xs text-muted-foreground sm:whitespace-nowrap">
+                  {filtered.length} de {products.length}
                 </div>
               </div>
-              <button
-                onClick={() => setDraft({ ...p, file: null })}
-                className="rounded-md p-2 text-muted-foreground hover:bg-secondary hover:text-foreground"
-                title="Editar"
-              >
-                <Pencil className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => {
-                  if (confirm(`Excluir "${p.name}"?`)) deleteMutation.mutate(p);
-                }}
-                className="rounded-md p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                title="Excluir"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </li>
-          ))}
-        </ul>
+
+              <ul className="mt-4 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+                {filtered.length === 0 && (
+                  <li className="p-8 text-center text-muted-foreground">
+                    {products.length === 0 ? "Nenhum produto cadastrado." : "Nenhum produto encontrado com esses filtros."}
+                  </li>
+                )}
+                {filtered.map((p) => (
+                  <li key={p.id} className="flex items-center gap-4 px-4 py-3">
+                    <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-white">
+                      {p.image_url && signedThumbs[p.image_url] ? (
+                        <img src={signedThumbs[p.image_url]} alt="" className="h-full w-full object-contain" />
+                      ) : (
+                        <ImageOff className="h-5 w-5 text-muted-foreground" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-semibold">{p.name}</div>
+                      <div className="truncate text-xs text-muted-foreground">
+                        {p.category}
+                        {p.description ? ` · ${p.description}` : ""}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setDraft({ ...p, file: null })}
+                      className="rounded-md p-2 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                      title="Editar"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm(`Excluir "${p.name}"?`)) deleteMutation.mutate(p);
+                      }}
+                      className="rounded-md p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                      title="Excluir"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </>
+          );
+        })()}
       </main>
     </div>
   );
