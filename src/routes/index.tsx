@@ -175,7 +175,7 @@ function Hero() {
       <div className="absolute inset-0 -z-10 opacity-70 [background-image:radial-gradient(circle_at_top_right,oklch(0.88_0.045_195/0.5),transparent_55%),radial-gradient(circle_at_bottom_left,oklch(0.28_0.025_200/0.18),transparent_55%)]" />
 
       {/* Full-width image carousel */}
-      <div className="relative h-[55vh] min-h-[420px] w-full sm:h-[60vh] sm:min-h-[500px]">
+      <div className="relative h-[60vh] min-h-[480px] w-full sm:h-[65vh] sm:min-h-[560px]">
         {slides.map((src, i) => (
           <img
             key={src + i}
@@ -190,12 +190,12 @@ function Hero() {
       {/* Text overlay */}
       <div className="absolute inset-0 flex items-center">
         <div className="mx-auto flex w-full max-w-7xl items-center px-4 py-16 sm:px-6 lg:py-24">
-          <div className="max-w-2xl">
+          <div className="max-w-3xl">
             <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
               Equipamentos e instrumentais para{" "}
               <span className="bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">videocirurgia</span> e linha convencional.
             </h1>
-            <p className="mt-5 max-w-xl text-base text-white/90 sm:text-lg">
+            <p className="mt-5 max-w-2xl text-base text-white/90 sm:text-lg">
               A VGM Medical fornece equipamentos e instrumentais cirúrgicos para hospitais, clínicas e profissionais da saúde, marcas reconhecidas e assistência técnica especializada.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
