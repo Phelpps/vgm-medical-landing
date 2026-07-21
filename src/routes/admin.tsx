@@ -71,7 +71,7 @@ function AdminPage() {
     };
   }, [navigate]);
 
-  const { data: products = [] } = useQuery({
+  const { data: products } = useQuery({
     queryKey: ["admin-products"],
     enabled: isAdmin === true,
     queryFn: async () => {
@@ -88,9 +88,10 @@ function AdminPage() {
 
   // Build signed thumbnail URLs in batch
   useEffect(() => {
+    if (!products) return;
     const paths = products.map((p) => p.image_url).filter((p): p is string => !!p);
     if (paths.length === 0) {
-      setSignedThumbs({});
+      setSignedThumbs((prev) => (Object.keys(prev).length === 0 ? prev : {}));
       return;
     }
     supabase.storage
@@ -266,9 +267,10 @@ function AdminPage() {
         )}
 
         {(() => {
-          const categories = Array.from(new Set(products.map((p) => p.category).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+          const list = products ?? [];
+          const categories = Array.from(new Set(list.map((p) => p.category).filter(Boolean))).sort((a, b) => a.localeCompare(b));
           const term = searchTerm.trim().toLowerCase();
-          const filtered = products.filter((p) => {
+          const filtered = list.filter((p) => {
             if (filterCategory !== "all" && p.category !== filterCategory) return false;
             if (term && !(`${p.name} ${p.description} ${p.category}`.toLowerCase().includes(term))) return false;
             return true;
@@ -294,14 +296,14 @@ function AdminPage() {
                   ))}
                 </select>
                 <div className="text-xs text-muted-foreground sm:whitespace-nowrap">
-                  {filtered.length} de {products.length}
+                  {filtered.length} de {list.length}
                 </div>
               </div>
 
               <ul className="mt-4 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
                 {filtered.length === 0 && (
                   <li className="p-8 text-center text-muted-foreground">
-                    {products.length === 0 ? "Nenhum produto cadastrado." : "Nenhum produto encontrado com esses filtros."}
+                    {list.length === 0 ? "Nenhum produto cadastrado." : "Nenhum produto encontrado com esses filtros."}
                   </li>
                 )}
                 {filtered.map((p) => (
