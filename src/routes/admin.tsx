@@ -270,7 +270,7 @@ function AdminPage() {
           const list = products ?? [];
           const categories = Array.from(new Set(list.map((p) => p.category).filter(Boolean))).sort((a, b) => a.localeCompare(b));
           const term = searchTerm.trim().toLowerCase();
-          const filtered = products.filter((p) => {
+          const filtered = list.filter((p) => {
             if (filterCategory !== "all" && p.category !== filterCategory) return false;
             if (term && !(`${p.name} ${p.description} ${p.category}`.toLowerCase().includes(term))) return false;
             return true;
@@ -296,14 +296,14 @@ function AdminPage() {
                   ))}
                 </select>
                 <div className="text-xs text-muted-foreground sm:whitespace-nowrap">
-                  {filtered.length} de {products.length}
+                  {filtered.length} de {list.length}
                 </div>
               </div>
 
               <ul className="mt-4 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
                 {filtered.length === 0 && (
                   <li className="p-8 text-center text-muted-foreground">
-                    {products.length === 0 ? "Nenhum produto cadastrado." : "Nenhum produto encontrado com esses filtros."}
+                    {list.length === 0 ? "Nenhum produto cadastrado." : "Nenhum produto encontrado com esses filtros."}
                   </li>
                 )}
                 {filtered.map((p) => (
