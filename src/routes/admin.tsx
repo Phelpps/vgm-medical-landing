@@ -267,7 +267,8 @@ function AdminPage() {
         )}
 
         {(() => {
-          const categories = Array.from(new Set(products.map((p) => p.category).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+          const list = products ?? [];
+          const categories = Array.from(new Set(list.map((p) => p.category).filter(Boolean))).sort((a, b) => a.localeCompare(b));
           const term = searchTerm.trim().toLowerCase();
           const filtered = products.filter((p) => {
             if (filterCategory !== "all" && p.category !== filterCategory) return false;
