@@ -71,7 +71,7 @@ function AdminPage() {
     };
   }, [navigate]);
 
-  const { data: products = [] } = useQuery({
+  const { data: products } = useQuery({
     queryKey: ["admin-products"],
     enabled: isAdmin === true,
     queryFn: async () => {
@@ -88,9 +88,10 @@ function AdminPage() {
 
   // Build signed thumbnail URLs in batch
   useEffect(() => {
+    if (!products) return;
     const paths = products.map((p) => p.image_url).filter((p): p is string => !!p);
     if (paths.length === 0) {
-      setSignedThumbs({});
+      setSignedThumbs((prev) => (Object.keys(prev).length === 0 ? prev : {}));
       return;
     }
     supabase.storage
