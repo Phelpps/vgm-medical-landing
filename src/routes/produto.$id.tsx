@@ -172,19 +172,47 @@ function ProductPage() {
             </nav>
 
             <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-              <div className="grid aspect-square place-items-center overflow-hidden rounded-3xl border border-border bg-white shadow-[var(--shadow-soft)]">
-                {product.image_url ? (
-                  imgUrl ? (
-                    <img
-                      src={imgUrl}
-                      alt={product.name}
-                      className="h-full w-full object-contain p-8"
-                    />
+              <div className="flex flex-col gap-3">
+                <div className="grid aspect-square place-items-center overflow-hidden rounded-3xl border border-border bg-white shadow-[var(--shadow-soft)]">
+                  {galleryPaths.length > 0 ? (
+                    imgUrl ? (
+                      <img
+                        src={imgUrl}
+                        alt={product.name}
+                        className="h-full w-full object-contain p-8"
+                      />
+                    ) : (
+                      <div className="text-sm text-muted-foreground">Carregando imagem…</div>
+                    )
                   ) : (
-                    <div className="text-sm text-muted-foreground">Carregando imagem…</div>
-                  )
-                ) : (
-                  <ImageOff className="h-12 w-12 text-muted-foreground" />
+                    <ImageOff className="h-12 w-12 text-muted-foreground" />
+                  )}
+                </div>
+                {galleryPaths.length > 1 && (
+                  <div className="flex flex-wrap gap-2">
+                    {galleryPaths.map((path) => {
+                      const isActive = currentPath === path;
+                      return (
+                        <button
+                          key={path}
+                          type="button"
+                          onClick={() => setActivePath(path)}
+                          className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-white transition ${
+                            isActive
+                              ? "border-primary ring-2 ring-primary/30"
+                              : "border-border hover:border-primary/60"
+                          }`}
+                          aria-label="Ver imagem"
+                        >
+                          {signed[path] ? (
+                            <img src={signed[path]} alt="" className="h-full w-full object-contain" />
+                          ) : (
+                            <div className="grid h-full w-full place-items-center text-[10px] text-muted-foreground">…</div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
 
