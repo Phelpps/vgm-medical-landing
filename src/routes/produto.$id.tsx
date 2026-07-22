@@ -85,7 +85,7 @@ function ProductPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, description, category, image_url, additional_info")
+        .select("id, name, description, category, image_url, image_urls, additional_info")
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
@@ -94,7 +94,16 @@ function ProductPage() {
     },
   });
 
-  const imgUrl = useSignedImage(product?.image_url ?? null);
+  const galleryPaths = product
+    ? [
+        ...(product.image_url ? [product.image_url] : []),
+        ...((product.image_urls ?? []).filter((p) => p !== product.image_url)),
+      ]
+    : [];
+  const signed = useSignedImages(galleryPaths);
+  const [activePath, setActivePath] = useState<string | null>(null);
+  const currentPath = activePath ?? galleryPaths[0] ?? null;
+  const imgUrl = currentPath ? signed[currentPath] ?? null : null;
   const qty = product ? getQuantity(product.id) : 0;
 
   return (
