@@ -122,11 +122,26 @@ function AdminPage() {
         if (upErr) throw upErr;
         image_url = path;
       }
+
+      // Upload any additional new images
+      const uploadedExtras: string[] = [];
+      for (const f of d.newFiles ?? []) {
+        const ext = f.name.split(".").pop() || "jpg";
+        const path = `${crypto.randomUUID()}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("product-images")
+          .upload(path, f, { contentType: f.type });
+        if (upErr) throw upErr;
+        uploadedExtras.push(path);
+      }
+      const image_urls = [...(d.image_urls ?? []), ...uploadedExtras];
+
       const payload = {
         name: d.name.trim(),
         description: d.description.trim(),
         category: d.category.trim() || "Geral",
         image_url,
+        image_urls,
         sort_order: d.sort_order,
         additional_info: d.additional_info,
       };
@@ -147,7 +162,11 @@ function AdminPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (p: Product) => {
-      if (p.image_url) await supabase.storage.from("product-images").remove([p.image_url]);
+      const toRemove = [
+        ...(p.image_url ? [p.image_url] : []),
+        ...(p.image_urls ?? []),
+      ];
+      if (toRemove.length) await supabase.storage.from("product-images").remove(toRemove);
       const { error } = await supabase.from("products").delete().eq("id", p.id);
       if (error) throw error;
     },
