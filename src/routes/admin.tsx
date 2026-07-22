@@ -493,6 +493,106 @@ function ProductForm({
   );
 }
 
+function ExtraImagesEditor({
+  existing,
+  onRemoveExisting,
+  newFiles,
+  onAddFiles,
+  onRemoveNewFile,
+}: {
+  existing: string[];
+  onRemoveExisting: (path: string) => void;
+  newFiles: File[];
+  onAddFiles: (files: File[]) => void;
+  onRemoveNewFile: (idx: number) => void;
+}) {
+  const [signed, setSigned] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (existing.length === 0) {
+      setSigned((prev) => (Object.keys(prev).length === 0 ? prev : {}));
+      return;
+    }
+    supabase.storage
+      .from("product-images")
+      .createSignedUrls(existing, 60 * 60)
+      .then(({ data }) => {
+        if (!data) return;
+        const map: Record<string, string> = {};
+        data.forEach((d) => {
+          if (d.path && d.signedUrl) map[d.path] = d.signedUrl;
+        });
+        setSigned(map);
+      });
+  }, [existing]);
+
+  const [previews, setPreviews] = useState<string[]>([]);
+  useEffect(() => {
+    const urls = newFiles.map((f) => URL.createObjectURL(f));
+    setPreviews(urls);
+    return () => urls.forEach((u) => URL.revokeObjectURL(u));
+  }, [newFiles]);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-3">
+        {existing.map((path) => (
+          <div key={path} className="relative h-24 w-24 overflow-hidden rounded-md border border-border bg-white">
+            {signed[path] ? (
+              <img src={signed[path]} alt="" className="h-full w-full object-contain" />
+            ) : (
+              <div className="grid h-full w-full place-items-center text-xs text-muted-foreground">…</div>
+            )}
+            <button
+              type="button"
+              onClick={() => onRemoveExisting(path)}
+              className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-black/60 text-white hover:bg-destructive"
+              title="Remover"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ))}
+        {newFiles.map((f, i) => (
+          <div key={`new-${i}`} className="relative h-24 w-24 overflow-hidden rounded-md border border-dashed border-primary/50 bg-white">
+            {previews[i] && <img src={previews[i]} alt="" className="h-full w-full object-contain" />}
+            <span className="absolute left-1 top-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+              NOVO
+            </span>
+            <button
+              type="button"
+              onClick={() => onRemoveNewFile(i)}
+              className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-black/60 text-white hover:bg-destructive"
+              title="Remover"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ))}
+        <label className="grid h-24 w-24 cursor-pointer place-items-center rounded-md border border-dashed border-border bg-background text-xs text-muted-foreground hover:bg-secondary">
+          <div className="flex flex-col items-center gap-1">
+            <Upload className="h-4 w-4" />
+            Adicionar
+          </div>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              const files = Array.from(e.target.files ?? []);
+              if (files.length) onAddFiles(files);
+              e.target.value = "";
+            }}
+          />
+        </label>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        As imagens adicionais aparecem na página do produto como galeria. A capa é a "Imagem de capa" acima.
+      </p>
+    </div>
+  );
+}
+
 function Field({ label, children, full }: { label: string; children: React.ReactNode; full?: boolean }) {
   return (
     <div className={full ? "sm:col-span-2" : ""}>
