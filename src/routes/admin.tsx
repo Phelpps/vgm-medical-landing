@@ -17,6 +17,7 @@ type Product = {
   description: string;
   category: string;
   image_url: string | null;
+  image_urls: string[];
   sort_order: number;
   additional_info: string;
 };
@@ -27,12 +28,14 @@ type Draft = {
   description: string;
   category: string;
   image_url: string | null;
+  image_urls: string[];
   sort_order: number;
   additional_info: string;
   file?: File | null;
+  newFiles?: File[];
 };
 
-const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, sort_order: 0, additional_info: "", file: null };
+const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, image_urls: [], sort_order: 0, additional_info: "", file: null, newFiles: [] };
 
 function AdminPage() {
   const navigate = useNavigate();
