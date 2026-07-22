@@ -43,28 +43,36 @@ type ProductDetail = {
   description: string;
   category: string;
   image_url: string | null;
+  image_urls: string[];
   additional_info: string;
 };
 
-function useSignedImage(path: string | null) {
-  const [url, setUrl] = useState<string | null>(null);
+function useSignedImages(paths: string[]) {
+  const [urls, setUrls] = useState<Record<string, string>>({});
+  const key = paths.join("|");
   useEffect(() => {
     let cancelled = false;
-    if (!path) {
-      setUrl(null);
+    if (paths.length === 0) {
+      setUrls({});
       return;
     }
     supabase.storage
       .from("product-images")
-      .createSignedUrl(path, 60 * 60)
+      .createSignedUrls(paths, 60 * 60)
       .then(({ data }) => {
-        if (!cancelled) setUrl(data?.signedUrl ?? null);
+        if (cancelled || !data) return;
+        const map: Record<string, string> = {};
+        data.forEach((d) => {
+          if (d.path && d.signedUrl) map[d.path] = d.signedUrl;
+        });
+        setUrls(map);
       });
     return () => {
       cancelled = true;
     };
-  }, [path]);
-  return url;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  return urls;
 }
 
 function ProductPage() {
@@ -77,7 +85,7 @@ function ProductPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, description, category, image_url, additional_info")
+        .select("id, name, description, category, image_url, image_urls, additional_info")
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
@@ -86,7 +94,16 @@ function ProductPage() {
     },
   });
 
-  const imgUrl = useSignedImage(product?.image_url ?? null);
+  const galleryPaths = product
+    ? [
+        ...(product.image_url ? [product.image_url] : []),
+        ...((product.image_urls ?? []).filter((p) => p !== product.image_url)),
+      ]
+    : [];
+  const signed = useSignedImages(galleryPaths);
+  const [activePath, setActivePath] = useState<string | null>(null);
+  const currentPath = activePath ?? galleryPaths[0] ?? null;
+  const imgUrl = currentPath ? signed[currentPath] ?? null : null;
   const qty = product ? getQuantity(product.id) : 0;
 
   return (
@@ -155,19 +172,47 @@ function ProductPage() {
             </nav>
 
             <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-              <div className="grid aspect-square place-items-center overflow-hidden rounded-3xl border border-border bg-white shadow-[var(--shadow-soft)]">
-                {product.image_url ? (
-                  imgUrl ? (
-                    <img
-                      src={imgUrl}
-                      alt={product.name}
-                      className="h-full w-full object-contain p-8"
-                    />
+              <div className="flex flex-col gap-3">
+                <div className="grid aspect-square place-items-center overflow-hidden rounded-3xl border border-border bg-white shadow-[var(--shadow-soft)]">
+                  {galleryPaths.length > 0 ? (
+                    imgUrl ? (
+                      <img
+                        src={imgUrl}
+                        alt={product.name}
+                        className="h-full w-full object-contain p-8"
+                      />
+                    ) : (
+                      <div className="text-sm text-muted-foreground">Carregando imagem…</div>
+                    )
                   ) : (
-                    <div className="text-sm text-muted-foreground">Carregando imagem…</div>
-                  )
-                ) : (
-                  <ImageOff className="h-12 w-12 text-muted-foreground" />
+                    <ImageOff className="h-12 w-12 text-muted-foreground" />
+                  )}
+                </div>
+                {galleryPaths.length > 1 && (
+                  <div className="flex flex-wrap gap-2">
+                    {galleryPaths.map((path) => {
+                      const isActive = currentPath === path;
+                      return (
+                        <button
+                          key={path}
+                          type="button"
+                          onClick={() => setActivePath(path)}
+                          className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-white transition ${
+                            isActive
+                              ? "border-primary ring-2 ring-primary/30"
+                              : "border-border hover:border-primary/60"
+                          }`}
+                          aria-label="Ver imagem"
+                        >
+                          {signed[path] ? (
+                            <img src={signed[path]} alt="" className="h-full w-full object-contain" />
+                          ) : (
+                            <div className="grid h-full w-full place-items-center text-[10px] text-muted-foreground">…</div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
 
