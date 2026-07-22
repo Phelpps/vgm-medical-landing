@@ -43,28 +43,36 @@ type ProductDetail = {
   description: string;
   category: string;
   image_url: string | null;
+  image_urls: string[];
   additional_info: string;
 };
 
-function useSignedImage(path: string | null) {
-  const [url, setUrl] = useState<string | null>(null);
+function useSignedImages(paths: string[]) {
+  const [urls, setUrls] = useState<Record<string, string>>({});
+  const key = paths.join("|");
   useEffect(() => {
     let cancelled = false;
-    if (!path) {
-      setUrl(null);
+    if (paths.length === 0) {
+      setUrls({});
       return;
     }
     supabase.storage
       .from("product-images")
-      .createSignedUrl(path, 60 * 60)
+      .createSignedUrls(paths, 60 * 60)
       .then(({ data }) => {
-        if (!cancelled) setUrl(data?.signedUrl ?? null);
+        if (cancelled || !data) return;
+        const map: Record<string, string> = {};
+        data.forEach((d) => {
+          if (d.path && d.signedUrl) map[d.path] = d.signedUrl;
+        });
+        setUrls(map);
       });
     return () => {
       cancelled = true;
     };
-  }, [path]);
-  return url;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  return urls;
 }
 
 function ProductPage() {
