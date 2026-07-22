@@ -345,7 +345,7 @@ function AdminPage() {
                       </div>
                     </div>
                     <button
-                      onClick={() => setDraft({ ...p, file: null })}
+                      onClick={() => setDraft({ ...p, image_urls: p.image_urls ?? [], file: null, newFiles: [] })}
                       className="rounded-md p-2 text-muted-foreground hover:bg-secondary hover:text-foreground"
                       title="Editar"
                     >
