@@ -52,6 +52,7 @@ export type Database = {
           description: string
           id: string
           image_url: string | null
+          image_urls: string[]
           name: string
           sort_order: number
           updated_at: string
@@ -63,6 +64,7 @@ export type Database = {
           description?: string
           id?: string
           image_url?: string | null
+          image_urls?: string[]
           name: string
           sort_order?: number
           updated_at?: string
@@ -74,6 +76,7 @@ export type Database = {
           description?: string
           id?: string
           image_url?: string | null
+          image_urls?: string[]
           name?: string
           sort_order?: number
           updated_at?: string
