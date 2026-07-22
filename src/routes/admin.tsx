@@ -446,7 +446,7 @@ function ProductForm({
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </Field>
-        <Field label="Imagem">
+        <Field label="Imagem de capa">
           <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border bg-background px-3 py-2 text-sm hover:bg-secondary">
             <Upload className="h-4 w-4" />
             {draft.file ? draft.file.name : draft.image_url ? "Substituir imagem" : "Selecionar imagem"}
@@ -458,6 +458,21 @@ function ProductForm({
             />
           </label>
           {preview && <img src={preview} alt="" className="mt-2 h-24 rounded-md border border-border object-contain" />}
+        </Field>
+        <Field label="Imagens adicionais (galeria)" full>
+          <ExtraImagesEditor
+            existing={draft.image_urls ?? []}
+            onRemoveExisting={(path) =>
+              onChange({ ...draft, image_urls: (draft.image_urls ?? []).filter((p) => p !== path) })
+            }
+            newFiles={draft.newFiles ?? []}
+            onAddFiles={(files) =>
+              onChange({ ...draft, newFiles: [...(draft.newFiles ?? []), ...files] })
+            }
+            onRemoveNewFile={(idx) =>
+              onChange({ ...draft, newFiles: (draft.newFiles ?? []).filter((_, i) => i !== idx) })
+            }
+          />
         </Field>
       </div>
       {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
