@@ -37,7 +37,35 @@ export const Route = createFileRoute("/produto/$id")({
   ),
 });
 
+function ZoomImage({ src, alt }: { src: string; alt: string }) {
+  const [origin, setOrigin] = useState("50% 50%");
+  const [zoomed, setZoomed] = useState(false);
+  return (
+    <div
+      className="h-full w-full overflow-hidden"
+      onMouseMove={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - r.left) / r.width) * 100;
+        const y = ((e.clientY - r.top) / r.height) * 100;
+        setOrigin(`${x}% ${y}%`);
+      }}
+      onMouseEnter={() => setZoomed(true)}
+      onMouseLeave={() => setZoomed(false)}
+    >
+      <img
+        src={src}
+        alt={alt}
+        style={{ transformOrigin: origin }}
+        className={`h-full w-full object-contain p-8 transition-transform duration-200 ease-out ${
+          zoomed ? "scale-[2.2] cursor-zoom-in" : "scale-100"
+        }`}
+      />
+    </div>
+  );
+}
+
 type ProductDetail = {
+
   id: string;
   name: string;
   description: string;
