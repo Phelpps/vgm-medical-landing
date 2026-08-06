@@ -327,9 +327,11 @@ function AdminPage() {
           const term = searchTerm.trim().toLowerCase();
           const filtered = list.filter((p) => {
             if (filterCategory !== "all" && p.category !== filterCategory) return false;
+            if (filterAvailability !== "all" && (p.availability ?? "catalogo") !== filterAvailability) return false;
             if (term && !(`${p.name} ${p.description} ${p.category}`.toLowerCase().includes(term))) return false;
             return true;
           });
+
           return (
             <>
               <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-soft)] sm:flex-row sm:items-center">
