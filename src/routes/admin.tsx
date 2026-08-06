@@ -384,14 +384,18 @@ function AdminPage() {
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-semibold">{p.name}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="truncate text-sm font-semibold">{p.name}</span>
+                        <AvailabilityBadge value={p.availability ?? "catalogo"} />
+                      </div>
                       <div className="truncate text-xs text-muted-foreground">
                         {p.category}
                         {p.description ? ` · ${p.description}` : ""}
                       </div>
                     </div>
                     <button
-                      onClick={() => setDraft({ ...p, image_urls: p.image_urls ?? [], file: null, newFiles: [] })}
+                      onClick={() => setDraft({ ...p, image_urls: p.image_urls ?? [], availability: p.availability ?? "catalogo", file: null, newFiles: [] })}
+
                       className="rounded-md p-2 text-muted-foreground hover:bg-secondary hover:text-foreground"
                       title="Editar"
                     >
