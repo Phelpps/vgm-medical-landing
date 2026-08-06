@@ -173,6 +173,8 @@ function AdminPage() {
         image_urls,
         sort_order: d.sort_order,
         additional_info: d.additional_info,
+        availability: d.availability ?? "catalogo",
+
       };
       if (d.id) {
         const { error } = await supabase.from("products").update(payload).eq("id", d.id);
