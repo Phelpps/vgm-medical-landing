@@ -13,9 +13,11 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const links = [
     { to: "/catalogo", label: "Catálogo" },
+    { to: "/locacao", label: "Locação" },
     { to: "/sobre", label: "Sobre" },
     { to: "/contato", label: "Contato" },
   ] as const;
+
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
