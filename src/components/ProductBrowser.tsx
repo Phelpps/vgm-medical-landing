@@ -50,6 +50,34 @@ function useSignedImage(path: string | null) {
   return url;
 }
 
+function HoverZoomImage({ src, alt }: { src: string; alt: string }) {
+  const [origin, setOrigin] = useState("50% 50%");
+  const [zoomed, setZoomed] = useState(false);
+  return (
+    <div
+      className="h-full w-full overflow-hidden"
+      onMouseMove={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        setOrigin(
+          `${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`,
+        );
+      }}
+      onMouseEnter={() => setZoomed(true)}
+      onMouseLeave={() => setZoomed(false)}
+    >
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        style={{ transformOrigin: origin }}
+        className={`h-full w-full object-contain p-6 transition-transform duration-200 ease-out ${
+          zoomed ? "scale-[2] cursor-zoom-in" : "scale-100"
+        }`}
+      />
+    </div>
+  );
+}
+
 function ProductCard({ p }: { p: Product }) {
   const imgUrl = useSignedImage(p.image_url);
   return (
@@ -61,12 +89,7 @@ function ProductCard({ p }: { p: Product }) {
       <div className="grid aspect-square place-items-center overflow-hidden bg-white">
         {p.image_url ? (
           imgUrl ? (
-            <img
-              src={imgUrl}
-              alt={p.name}
-              loading="lazy"
-              className="h-full w-full object-contain p-6 transition-transform duration-500 ease-out group-hover:scale-[1.6]"
-            />
+            <HoverZoomImage src={imgUrl} alt={p.name} />
           ) : (
             <div className="text-xs text-muted-foreground">Carregando…</div>
           )
@@ -74,6 +97,7 @@ function ProductCard({ p }: { p: Product }) {
           <ImageOff className="h-10 w-10 text-muted-foreground" />
         )}
       </div>
+
       <div className="border-t border-border bg-card p-4">
         <div className="text-xs font-semibold uppercase tracking-wider text-primary">
           {p.category}
