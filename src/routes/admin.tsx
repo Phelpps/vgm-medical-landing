@@ -343,6 +343,16 @@ function AdminPage() {
                   className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
                 <select
+                  value={filterAvailability}
+                  onChange={(e) => setFilterAvailability(e.target.value)}
+                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                >
+                  <option value="all">Todas as vitrines</option>
+                  {AVAILABILITY_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+
                   value={filterCategory}
                   onChange={(e) => setFilterCategory(e.target.value)}
                   className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
