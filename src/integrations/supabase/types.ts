@@ -47,6 +47,7 @@ export type Database = {
       products: {
         Row: {
           additional_info: string
+          availability: Database["public"]["Enums"]["product_availability"]
           category: string
           created_at: string
           description: string
@@ -59,6 +60,7 @@ export type Database = {
         }
         Insert: {
           additional_info?: string
+          availability?: Database["public"]["Enums"]["product_availability"]
           category?: string
           created_at?: string
           description?: string
@@ -71,6 +73,7 @@ export type Database = {
         }
         Update: {
           additional_info?: string
+          availability?: Database["public"]["Enums"]["product_availability"]
           category?: string
           created_at?: string
           description?: string
@@ -137,6 +140,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      product_availability: "catalogo" | "locacao" | "fora_de_estoque"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -265,6 +269,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      product_availability: ["catalogo", "locacao", "fora_de_estoque"],
     },
   },
 } as const

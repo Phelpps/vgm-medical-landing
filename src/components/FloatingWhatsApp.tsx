@@ -5,7 +5,7 @@ const WHATSAPP_NUMBER = "556298341044";
 
 export function FloatingWhatsApp() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  if (pathname !== "/catalogo") return null;
+  if (pathname !== "/catalogo" && pathname !== "/locacao") return null;
 
   return (
     <a

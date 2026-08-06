@@ -37,7 +37,35 @@ export const Route = createFileRoute("/produto/$id")({
   ),
 });
 
+function ZoomImage({ src, alt }: { src: string; alt: string }) {
+  const [origin, setOrigin] = useState("50% 50%");
+  const [zoomed, setZoomed] = useState(false);
+  return (
+    <div
+      className="h-full w-full overflow-hidden"
+      onMouseMove={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - r.left) / r.width) * 100;
+        const y = ((e.clientY - r.top) / r.height) * 100;
+        setOrigin(`${x}% ${y}%`);
+      }}
+      onMouseEnter={() => setZoomed(true)}
+      onMouseLeave={() => setZoomed(false)}
+    >
+      <img
+        src={src}
+        alt={alt}
+        style={{ transformOrigin: origin }}
+        className={`h-full w-full object-contain p-8 transition-transform duration-200 ease-out ${
+          zoomed ? "scale-[2.2] cursor-zoom-in" : "scale-100"
+        }`}
+      />
+    </div>
+  );
+}
+
 type ProductDetail = {
+
   id: string;
   name: string;
   description: string;
@@ -176,11 +204,7 @@ function ProductPage() {
                 <div className="grid aspect-square place-items-center overflow-hidden rounded-3xl border border-border bg-white shadow-[var(--shadow-soft)]">
                   {galleryPaths.length > 0 ? (
                     imgUrl ? (
-                      <img
-                        src={imgUrl}
-                        alt={product.name}
-                        className="h-full w-full object-contain p-8"
-                      />
+                      <ZoomImage src={imgUrl} alt={product.name} />
                     ) : (
                       <div className="text-sm text-muted-foreground">Carregando imagem…</div>
                     )
@@ -188,6 +212,7 @@ function ProductPage() {
                     <ImageOff className="h-12 w-12 text-muted-foreground" />
                   )}
                 </div>
+
                 {galleryPaths.length > 1 && (
                   <div className="flex flex-wrap gap-2">
                     {galleryPaths.map((path) => {

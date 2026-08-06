@@ -11,6 +11,32 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
+type Availability = "catalogo" | "locacao" | "fora_de_estoque";
+
+const AVAILABILITY_OPTIONS: { value: Availability; label: string }[] = [
+  { value: "catalogo", label: "Catálogo" },
+  { value: "locacao", label: "Locação" },
+  { value: "fora_de_estoque", label: "Fora de estoque" },
+];
+
+const AVAILABILITY_BADGE: Record<Availability, string> = {
+  catalogo: "border-primary/30 bg-primary/10 text-primary",
+  locacao: "border-amber-500/30 bg-amber-500/10 text-amber-700",
+  fora_de_estoque: "border-destructive/30 bg-destructive/10 text-destructive",
+};
+
+function AvailabilityBadge({ value }: { value: Availability }) {
+  const label = AVAILABILITY_OPTIONS.find((o) => o.value === value)?.label ?? value;
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide ${AVAILABILITY_BADGE[value]}`}
+    >
+      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+      {label}
+    </span>
+  );
+}
+
 type Product = {
   id: string;
   name: string;
@@ -20,6 +46,7 @@ type Product = {
   image_urls: string[];
   sort_order: number;
   additional_info: string;
+  availability: Availability;
 };
 
 type Draft = {
@@ -31,11 +58,13 @@ type Draft = {
   image_urls: string[];
   sort_order: number;
   additional_info: string;
+  availability: Availability;
   file?: File | null;
   newFiles?: File[];
 };
 
-const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, image_urls: [], sort_order: 0, additional_info: "", file: null, newFiles: [] };
+const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, image_urls: [], sort_order: 0, additional_info: "", availability: "catalogo", file: null, newFiles: [] };
+
 
 function AdminPage() {
   const navigate = useNavigate();
@@ -48,6 +77,8 @@ function AdminPage() {
   const [showNewUser, setShowNewUser] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [filterAvailability, setFilterAvailability] = useState<string>("all");
+
   const [searchTerm, setSearchTerm] = useState("");
   const createUser = useServerFn(createAdminUser);
 
@@ -144,6 +175,8 @@ function AdminPage() {
         image_urls,
         sort_order: d.sort_order,
         additional_info: d.additional_info,
+        availability: d.availability ?? "catalogo",
+
       };
       if (d.id) {
         const { error } = await supabase.from("products").update(payload).eq("id", d.id);
@@ -294,9 +327,11 @@ function AdminPage() {
           const term = searchTerm.trim().toLowerCase();
           const filtered = list.filter((p) => {
             if (filterCategory !== "all" && p.category !== filterCategory) return false;
+            if (filterAvailability !== "all" && (p.availability ?? "catalogo") !== filterAvailability) return false;
             if (term && !(`${p.name} ${p.description} ${p.category}`.toLowerCase().includes(term))) return false;
             return true;
           });
+
           return (
             <>
               <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-soft)] sm:flex-row sm:items-center">
@@ -308,7 +343,18 @@ function AdminPage() {
                   className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
                 <select
+                  value={filterAvailability}
+                  onChange={(e) => setFilterAvailability(e.target.value)}
+                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                >
+                  <option value="all">Todas as vitrines</option>
+                  {AVAILABILITY_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+                <select
                   value={filterCategory}
+
                   onChange={(e) => setFilterCategory(e.target.value)}
                   className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                 >
@@ -338,14 +384,18 @@ function AdminPage() {
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-semibold">{p.name}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="truncate text-sm font-semibold">{p.name}</span>
+                        <AvailabilityBadge value={p.availability ?? "catalogo"} />
+                      </div>
                       <div className="truncate text-xs text-muted-foreground">
                         {p.category}
                         {p.description ? ` · ${p.description}` : ""}
                       </div>
                     </div>
                     <button
-                      onClick={() => setDraft({ ...p, image_urls: p.image_urls ?? [], file: null, newFiles: [] })}
+                      onClick={() => setDraft({ ...p, image_urls: p.image_urls ?? [], availability: p.availability ?? "catalogo", file: null, newFiles: [] })}
+
                       className="rounded-md p-2 text-muted-foreground hover:bg-secondary hover:text-foreground"
                       title="Editar"
                     >
@@ -421,6 +471,34 @@ function ProductForm({
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </Field>
+        <Field label="Onde exibir este produto" full>
+          <div className="flex flex-wrap gap-2">
+            {AVAILABILITY_OPTIONS.map((o) => {
+              const active = (draft.availability ?? "catalogo") === o.value;
+              return (
+                <label
+                  key={o.value}
+                  className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                    active ? AVAILABILITY_BADGE[o.value] : "border-border bg-background text-muted-foreground hover:bg-secondary"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="availability"
+                    className="accent-current"
+                    checked={active}
+                    onChange={() => onChange({ ...draft, availability: o.value })}
+                  />
+                  {o.label}
+                </label>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            "Fora de estoque" mantém o produto cadastrado, mas oculto nas duas abas do site.
+          </p>
+        </Field>
+
         <Field label="Descrição curta" full>
           <textarea
             value={draft.description}
