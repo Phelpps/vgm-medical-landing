@@ -176,11 +176,7 @@ function ProductPage() {
                 <div className="grid aspect-square place-items-center overflow-hidden rounded-3xl border border-border bg-white shadow-[var(--shadow-soft)]">
                   {galleryPaths.length > 0 ? (
                     imgUrl ? (
-                      <img
-                        src={imgUrl}
-                        alt={product.name}
-                        className="h-full w-full object-contain p-8"
-                      />
+                      <ZoomImage src={imgUrl} alt={product.name} />
                     ) : (
                       <div className="text-sm text-muted-foreground">Carregando imagem…</div>
                     )
@@ -188,6 +184,7 @@ function ProductPage() {
                     <ImageOff className="h-12 w-12 text-muted-foreground" />
                   )}
                 </div>
+
                 {galleryPaths.length > 1 && (
                   <div className="flex flex-wrap gap-2">
                     {galleryPaths.map((path) => {
