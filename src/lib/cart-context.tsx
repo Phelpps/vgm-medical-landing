@@ -1,10 +1,13 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
+export type CartKind = "catalogo" | "locacao";
+
 export type CartItem = {
   id: string;
   name: string;
   category: string;
   quantity: number;
+  kind: CartKind;
 };
 
 type CartContextValue = {
@@ -28,7 +31,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : null;
-      if (raw) setItems(JSON.parse(raw));
+      if (raw) {
+        const parsed = JSON.parse(raw) as CartItem[];
+        setItems(
+          (Array.isArray(parsed) ? parsed : []).map((it) => ({
+            ...it,
+            kind: it.kind === "locacao" ? "locacao" : "catalogo",
+          })),
+        );
+      }
     } catch {
       // ignore
     }
