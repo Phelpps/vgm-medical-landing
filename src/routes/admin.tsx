@@ -11,6 +11,32 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
+type Availability = "catalogo" | "locacao" | "fora_de_estoque";
+
+const AVAILABILITY_OPTIONS: { value: Availability; label: string }[] = [
+  { value: "catalogo", label: "Catálogo" },
+  { value: "locacao", label: "Locação" },
+  { value: "fora_de_estoque", label: "Fora de estoque" },
+];
+
+const AVAILABILITY_BADGE: Record<Availability, string> = {
+  catalogo: "border-primary/30 bg-primary/10 text-primary",
+  locacao: "border-amber-500/30 bg-amber-500/10 text-amber-700",
+  fora_de_estoque: "border-destructive/30 bg-destructive/10 text-destructive",
+};
+
+function AvailabilityBadge({ value }: { value: Availability }) {
+  const label = AVAILABILITY_OPTIONS.find((o) => o.value === value)?.label ?? value;
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide ${AVAILABILITY_BADGE[value]}`}
+    >
+      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+      {label}
+    </span>
+  );
+}
+
 type Product = {
   id: string;
   name: string;
@@ -20,6 +46,7 @@ type Product = {
   image_urls: string[];
   sort_order: number;
   additional_info: string;
+  availability: Availability;
 };
 
 type Draft = {
@@ -31,11 +58,13 @@ type Draft = {
   image_urls: string[];
   sort_order: number;
   additional_info: string;
+  availability: Availability;
   file?: File | null;
   newFiles?: File[];
 };
 
-const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, image_urls: [], sort_order: 0, additional_info: "", file: null, newFiles: [] };
+const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, image_urls: [], sort_order: 0, additional_info: "", availability: "catalogo", file: null, newFiles: [] };
+
 
 function AdminPage() {
   const navigate = useNavigate();
