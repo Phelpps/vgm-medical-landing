@@ -471,6 +471,34 @@ function ProductForm({
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </Field>
+        <Field label="Onde exibir este produto" full>
+          <div className="flex flex-wrap gap-2">
+            {AVAILABILITY_OPTIONS.map((o) => {
+              const active = (draft.availability ?? "catalogo") === o.value;
+              return (
+                <label
+                  key={o.value}
+                  className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                    active ? AVAILABILITY_BADGE[o.value] : "border-border bg-background text-muted-foreground hover:bg-secondary"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="availability"
+                    className="accent-current"
+                    checked={active}
+                    onChange={() => onChange({ ...draft, availability: o.value })}
+                  />
+                  {o.label}
+                </label>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            "Fora de estoque" mantém o produto cadastrado, mas oculto nas duas abas do site.
+          </p>
+        </Field>
+
         <Field label="Descrição curta" full>
           <textarea
             value={draft.description}
