@@ -73,6 +73,7 @@ type ProductDetail = {
   image_url: string | null;
   image_urls: string[];
   additional_info: string;
+  availability: "catalogo" | "locacao" | "fora_de_estoque";
 };
 
 function useSignedImages(paths: string[]) {
@@ -113,7 +114,7 @@ function ProductPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, description, category, image_url, image_urls, additional_info")
+        .select("id, name, description, category, image_url, image_urls, additional_info, availability")
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
@@ -257,7 +258,12 @@ function ProductPage() {
                     <button
                       type="button"
                       onClick={() =>
-                        add({ id: product.id, name: product.name, category: product.category })
+                        add({
+                          id: product.id,
+                          name: product.name,
+                          category: product.category,
+                          kind: product.availability === "locacao" ? "locacao" : "catalogo",
+                        })
                       }
                       className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] transition hover:opacity-90"
                     >

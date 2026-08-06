@@ -18,14 +18,62 @@ export const Route = createFileRoute("/carrinho")({
 function CartPage() {
   const { items, increment, decrement, remove, clear, totalCount } = useCart();
 
+  const catalogItems = items.filter((it) => it.kind !== "locacao");
+  const rentalItems = items.filter((it) => it.kind === "locacao");
+
+  const section = (title: string, list: typeof items) =>
+    list.length > 0 ? `${title}:\n${list.map((it) => `• ${it.name} — Quantidade: ${it.quantity}`).join("\n")}` : "";
+
   const whatsappMessage =
     items.length > 0
-      ? `Olá! Tenho interesse nos seguintes produtos:\n\n${items
-          .map((it) => `• ${it.name} — Quantidade: ${it.quantity}`)
-          .join("\n")}\n\nPode me enviar mais informações?`
+      ? `Olá! Tenho interesse nos seguintes itens:\n\n${[
+          section("COMPRA (Catálogo)", catalogItems),
+          section("LOCAÇÃO", rentalItems),
+        ]
+          .filter(Boolean)
+          .join("\n\n")}\n\nPode me enviar mais informações?`
       : "";
 
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
+
+  const renderList = (list: typeof items) => (
+    <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)]">
+      {list.map((it) => (
+        <li key={it.id} className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5">
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-semibold">{it.name}</div>
+            <div className="text-xs text-muted-foreground">{it.category}</div>
+          </div>
+          <div className="flex items-center gap-2 rounded-full border border-border bg-background p-1">
+            <button
+              type="button"
+              onClick={() => decrement(it.id)}
+              className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+              aria-label="Diminuir"
+            >
+              <Minus className="h-4 w-4" />
+            </button>
+            <span className="min-w-[2ch] text-center text-sm font-semibold">{it.quantity}</span>
+            <button
+              type="button"
+              onClick={() => increment(it.id)}
+              className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+              aria-label="Aumentar"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          </div>
+          <button
+            type="button"
+            onClick={() => remove(it.id)}
+            className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium text-destructive transition hover:bg-destructive/10"
+          >
+            <Trash2 className="h-4 w-4" /> Remover
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -76,44 +124,41 @@ function CartPage() {
           </div>
         ) : (
           <>
-            <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)]">
-              {items.map((it) => (
-                <li key={it.id} className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5">
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-semibold">{it.name}</div>
-                    <div className="text-xs text-muted-foreground">{it.category}</div>
-                  </div>
-                  <div className="flex items-center gap-2 rounded-full border border-border bg-background p-1">
-                    <button
-                      type="button"
-                      onClick={() => decrement(it.id)}
-                      className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary hover:text-foreground"
-                      aria-label="Diminuir"
-                    >
-                      <Minus className="h-4 w-4" />
-                    </button>
-                    <span className="min-w-[2ch] text-center text-sm font-semibold">{it.quantity}</span>
-                    <button
-                      type="button"
-                      onClick={() => increment(it.id)}
-                      className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary hover:text-foreground"
-                      aria-label="Aumentar"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => remove(it.id)}
-                    className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium text-destructive transition hover:bg-destructive/10"
-                  >
-                    <Trash2 className="h-4 w-4" /> Remover
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <div className="space-y-8">
+              <section>
+                <div className="mb-3 flex items-center gap-2">
+                  <h2 className="text-sm font-bold uppercase tracking-[0.18em] text-primary">Catálogo</h2>
+                  <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                    {catalogItems.reduce((s, it) => s + it.quantity, 0)}
+                  </span>
+                </div>
+                {catalogItems.length > 0 ? (
+                  renderList(catalogItems)
+                ) : (
+                  <p className="rounded-2xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
+                    Nenhum produto de catálogo adicionado.
+                  </p>
+                )}
+              </section>
 
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+              <section>
+                <div className="mb-3 flex items-center gap-2">
+                  <h2 className="text-sm font-bold uppercase tracking-[0.18em] text-amber-700">Locação</h2>
+                  <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-700">
+                    {rentalItems.reduce((s, it) => s + it.quantity, 0)}
+                  </span>
+                </div>
+                {rentalItems.length > 0 ? (
+                  renderList(rentalItems)
+                ) : (
+                  <p className="rounded-2xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
+                    Nenhum item de locação adicionado.
+                  </p>
+                )}
+              </section>
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
               <button
                 type="button"
                 onClick={clear}
