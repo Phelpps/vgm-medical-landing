@@ -77,6 +77,8 @@ function AdminPage() {
   const [showNewUser, setShowNewUser] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [filterAvailability, setFilterAvailability] = useState<string>("all");
+
   const [searchTerm, setSearchTerm] = useState("");
   const createUser = useServerFn(createAdminUser);
 
