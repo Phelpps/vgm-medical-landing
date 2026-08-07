@@ -19,21 +19,40 @@ const AVAILABILITY_OPTIONS: { value: Availability; label: string }[] = [
   { value: "fora_de_estoque", label: "Fora de estoque" },
 ];
 
+const SHOWCASE_OPTIONS: { value: Exclude<Availability, "fora_de_estoque">; label: string }[] = [
+  { value: "catalogo", label: "Catálogo" },
+  { value: "locacao", label: "Locação" },
+];
+
 const AVAILABILITY_BADGE: Record<Availability, string> = {
   catalogo: "border-primary/30 bg-primary/10 text-primary",
   locacao: "border-amber-500/30 bg-amber-500/10 text-amber-700",
   fora_de_estoque: "border-destructive/30 bg-destructive/10 text-destructive",
 };
 
-function AvailabilityBadge({ value }: { value: Availability }) {
-  const label = AVAILABILITY_OPTIONS.find((o) => o.value === value)?.label ?? value;
+function normalizeAvailabilities(list: Availability[] | null | undefined, fallback?: Availability): Availability[] {
+  const cleaned = (list ?? []).filter((v) => v === "catalogo" || v === "locacao");
+  if (cleaned.length > 0) return Array.from(new Set(cleaned));
+  if (fallback === "catalogo" || fallback === "locacao") return [fallback];
+  return ["fora_de_estoque"];
+}
+
+function AvailabilityBadges({ values }: { values: Availability[] }) {
   return (
-    <span
-      className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide ${AVAILABILITY_BADGE[value]}`}
-    >
-      <span className="h-1.5 w-1.5 rounded-full bg-current" />
-      {label}
-    </span>
+    <>
+      {values.map((value) => {
+        const label = AVAILABILITY_OPTIONS.find((o) => o.value === value)?.label ?? value;
+        return (
+          <span
+            key={value}
+            className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide ${AVAILABILITY_BADGE[value]}`}
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-current" />
+            {label}
+          </span>
+        );
+      })}
+    </>
   );
 }
 
@@ -47,6 +66,7 @@ type Product = {
   sort_order: number;
   additional_info: string;
   availability: Availability;
+  availabilities: Availability[];
 };
 
 type Draft = {
@@ -58,12 +78,12 @@ type Draft = {
   image_urls: string[];
   sort_order: number;
   additional_info: string;
-  availability: Availability;
+  availabilities: Availability[];
   file?: File | null;
   newFiles?: File[];
 };
 
-const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, image_urls: [], sort_order: 0, additional_info: "", availability: "catalogo", file: null, newFiles: [] };
+const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, image_urls: [], sort_order: 0, additional_info: "", availabilities: ["catalogo"], file: null, newFiles: [] };
 
 
 function AdminPage() {
