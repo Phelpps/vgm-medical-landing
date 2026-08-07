@@ -74,6 +74,7 @@ type ProductDetail = {
   image_urls: string[];
   additional_info: string;
   availability: "catalogo" | "locacao" | "fora_de_estoque";
+  availabilities: ("catalogo" | "locacao" | "fora_de_estoque")[];
 };
 
 function useSignedImages(paths: string[]) {
