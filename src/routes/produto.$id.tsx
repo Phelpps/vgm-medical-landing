@@ -263,7 +263,10 @@ function ProductPage() {
                           id: product.id,
                           name: product.name,
                           category: product.category,
-                          kind: product.availability === "locacao" ? "locacao" : "catalogo",
+                          kind:
+                            (product.availabilities ?? [product.availability]).includes("catalogo")
+                              ? "catalogo"
+                              : "locacao",
                         })
                       }
                       className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] transition hover:opacity-90"
