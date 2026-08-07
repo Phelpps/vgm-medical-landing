@@ -21,7 +21,7 @@ async function fetchProducts(availability: Availability): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
     .select("id, name, description, category, image_url, sort_order")
-    .eq("availability", availability)
+    .contains("availabilities", [availability])
     .order("category", { ascending: true })
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });

@@ -19,21 +19,40 @@ const AVAILABILITY_OPTIONS: { value: Availability; label: string }[] = [
   { value: "fora_de_estoque", label: "Fora de estoque" },
 ];
 
+const SHOWCASE_OPTIONS: { value: Exclude<Availability, "fora_de_estoque">; label: string }[] = [
+  { value: "catalogo", label: "Catálogo" },
+  { value: "locacao", label: "Locação" },
+];
+
 const AVAILABILITY_BADGE: Record<Availability, string> = {
   catalogo: "border-primary/30 bg-primary/10 text-primary",
   locacao: "border-amber-500/30 bg-amber-500/10 text-amber-700",
   fora_de_estoque: "border-destructive/30 bg-destructive/10 text-destructive",
 };
 
-function AvailabilityBadge({ value }: { value: Availability }) {
-  const label = AVAILABILITY_OPTIONS.find((o) => o.value === value)?.label ?? value;
+function normalizeAvailabilities(list: Availability[] | null | undefined, fallback?: Availability): Availability[] {
+  const cleaned = (list ?? []).filter((v) => v === "catalogo" || v === "locacao");
+  if (cleaned.length > 0) return Array.from(new Set(cleaned));
+  if (fallback === "catalogo" || fallback === "locacao") return [fallback];
+  return ["fora_de_estoque"];
+}
+
+function AvailabilityBadges({ values }: { values: Availability[] }) {
   return (
-    <span
-      className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide ${AVAILABILITY_BADGE[value]}`}
-    >
-      <span className="h-1.5 w-1.5 rounded-full bg-current" />
-      {label}
-    </span>
+    <>
+      {values.map((value) => {
+        const label = AVAILABILITY_OPTIONS.find((o) => o.value === value)?.label ?? value;
+        return (
+          <span
+            key={value}
+            className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide ${AVAILABILITY_BADGE[value]}`}
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-current" />
+            {label}
+          </span>
+        );
+      })}
+    </>
   );
 }
 
@@ -47,6 +66,7 @@ type Product = {
   sort_order: number;
   additional_info: string;
   availability: Availability;
+  availabilities: Availability[];
 };
 
 type Draft = {
@@ -58,12 +78,12 @@ type Draft = {
   image_urls: string[];
   sort_order: number;
   additional_info: string;
-  availability: Availability;
+  availabilities: Availability[];
   file?: File | null;
   newFiles?: File[];
 };
 
-const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, image_urls: [], sort_order: 0, additional_info: "", availability: "catalogo", file: null, newFiles: [] };
+const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, image_urls: [], sort_order: 0, additional_info: "", availabilities: ["catalogo"], file: null, newFiles: [] };
 
 
 function AdminPage() {
@@ -175,7 +195,8 @@ function AdminPage() {
         image_urls,
         sort_order: d.sort_order,
         additional_info: d.additional_info,
-        availability: d.availability ?? "catalogo",
+        availabilities: normalizeAvailabilities(d.availabilities),
+        availability: normalizeAvailabilities(d.availabilities)[0],
 
       };
       if (d.id) {
@@ -327,7 +348,7 @@ function AdminPage() {
           const term = searchTerm.trim().toLowerCase();
           const filtered = list.filter((p) => {
             if (filterCategory !== "all" && p.category !== filterCategory) return false;
-            if (filterAvailability !== "all" && (p.availability ?? "catalogo") !== filterAvailability) return false;
+            if (filterAvailability !== "all" && !normalizeAvailabilities(p.availabilities, p.availability).includes(filterAvailability as Availability)) return false;
             if (term && !(`${p.name} ${p.description} ${p.category}`.toLowerCase().includes(term))) return false;
             return true;
           });
@@ -386,7 +407,7 @@ function AdminPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <span className="truncate text-sm font-semibold">{p.name}</span>
-                        <AvailabilityBadge value={p.availability ?? "catalogo"} />
+                        <AvailabilityBadges values={normalizeAvailabilities(p.availabilities, p.availability)} />
                       </div>
                       <div className="truncate text-xs text-muted-foreground">
                         {p.category}
@@ -394,7 +415,7 @@ function AdminPage() {
                       </div>
                     </div>
                     <button
-                      onClick={() => setDraft({ ...p, image_urls: p.image_urls ?? [], availability: p.availability ?? "catalogo", file: null, newFiles: [] })}
+                      onClick={() => setDraft({ ...p, image_urls: p.image_urls ?? [], availabilities: normalizeAvailabilities(p.availabilities, p.availability), file: null, newFiles: [] })}
 
                       className="rounded-md p-2 text-muted-foreground hover:bg-secondary hover:text-foreground"
                       title="Editar"
@@ -473,8 +494,9 @@ function ProductForm({
         </Field>
         <Field label="Onde exibir este produto" full>
           <div className="flex flex-wrap gap-2">
-            {AVAILABILITY_OPTIONS.map((o) => {
-              const active = (draft.availability ?? "catalogo") === o.value;
+            {SHOWCASE_OPTIONS.map((o) => {
+              const current = draft.availabilities ?? [];
+              const active = current.includes(o.value);
               return (
                 <label
                   key={o.value}
@@ -483,21 +505,43 @@ function ProductForm({
                   }`}
                 >
                   <input
-                    type="radio"
-                    name="availability"
+                    type="checkbox"
                     className="accent-current"
                     checked={active}
-                    onChange={() => onChange({ ...draft, availability: o.value })}
+                    onChange={() =>
+                      onChange({
+                        ...draft,
+                        availabilities: normalizeAvailabilities(
+                          active ? current.filter((v) => v !== o.value) : [...current, o.value],
+                        ),
+                      })
+                    }
                   />
                   {o.label}
                 </label>
               );
             })}
+            <label
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                normalizeAvailabilities(draft.availabilities)[0] === "fora_de_estoque"
+                  ? AVAILABILITY_BADGE.fora_de_estoque
+                  : "border-border bg-background text-muted-foreground hover:bg-secondary"
+              }`}
+            >
+              <input
+                type="checkbox"
+                className="accent-current"
+                checked={normalizeAvailabilities(draft.availabilities)[0] === "fora_de_estoque"}
+                onChange={() => onChange({ ...draft, availabilities: ["fora_de_estoque"] })}
+              />
+              Fora de estoque
+            </label>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            "Fora de estoque" mantém o produto cadastrado, mas oculto nas duas abas do site.
+            Marque Catálogo e Locação juntos para exibir o produto nas duas abas. "Fora de estoque" (nenhuma vitrine marcada) mantém o produto cadastrado, mas oculto no site.
           </p>
         </Field>
+
 
         <Field label="Descrição curta" full>
           <textarea

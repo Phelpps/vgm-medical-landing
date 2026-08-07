@@ -74,6 +74,7 @@ type ProductDetail = {
   image_urls: string[];
   additional_info: string;
   availability: "catalogo" | "locacao" | "fora_de_estoque";
+  availabilities: ("catalogo" | "locacao" | "fora_de_estoque")[];
 };
 
 function useSignedImages(paths: string[]) {
@@ -114,7 +115,7 @@ function ProductPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, description, category, image_url, image_urls, additional_info, availability")
+        .select("id, name, description, category, image_url, image_urls, additional_info, availability, availabilities")
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
@@ -262,7 +263,10 @@ function ProductPage() {
                           id: product.id,
                           name: product.name,
                           category: product.category,
-                          kind: product.availability === "locacao" ? "locacao" : "catalogo",
+                          kind:
+                            (product.availabilities ?? [product.availability]).includes("catalogo")
+                              ? "catalogo"
+                              : "locacao",
                         })
                       }
                       className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] transition hover:opacity-90"
