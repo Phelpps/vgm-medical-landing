@@ -407,7 +407,7 @@ function AdminPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <span className="truncate text-sm font-semibold">{p.name}</span>
-                        <AvailabilityBadge value={p.availability ?? "catalogo"} />
+                        <AvailabilityBadges values={normalizeAvailabilities(p.availabilities, p.availability)} />
                       </div>
                       <div className="truncate text-xs text-muted-foreground">
                         {p.category}
