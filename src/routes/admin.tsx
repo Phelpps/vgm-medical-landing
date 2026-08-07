@@ -494,8 +494,9 @@ function ProductForm({
         </Field>
         <Field label="Onde exibir este produto" full>
           <div className="flex flex-wrap gap-2">
-            {AVAILABILITY_OPTIONS.map((o) => {
-              const active = (draft.availability ?? "catalogo") === o.value;
+            {SHOWCASE_OPTIONS.map((o) => {
+              const current = draft.availabilities ?? [];
+              const active = current.includes(o.value);
               return (
                 <label
                   key={o.value}
@@ -504,21 +505,43 @@ function ProductForm({
                   }`}
                 >
                   <input
-                    type="radio"
-                    name="availability"
+                    type="checkbox"
                     className="accent-current"
                     checked={active}
-                    onChange={() => onChange({ ...draft, availability: o.value })}
+                    onChange={() =>
+                      onChange({
+                        ...draft,
+                        availabilities: normalizeAvailabilities(
+                          active ? current.filter((v) => v !== o.value) : [...current, o.value],
+                        ),
+                      })
+                    }
                   />
                   {o.label}
                 </label>
               );
             })}
+            <label
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                normalizeAvailabilities(draft.availabilities)[0] === "fora_de_estoque"
+                  ? AVAILABILITY_BADGE.fora_de_estoque
+                  : "border-border bg-background text-muted-foreground hover:bg-secondary"
+              }`}
+            >
+              <input
+                type="checkbox"
+                className="accent-current"
+                checked={normalizeAvailabilities(draft.availabilities)[0] === "fora_de_estoque"}
+                onChange={() => onChange({ ...draft, availabilities: ["fora_de_estoque"] })}
+              />
+              Fora de estoque
+            </label>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            "Fora de estoque" mantém o produto cadastrado, mas oculto nas duas abas do site.
+            Marque Catálogo e Locação juntos para exibir o produto nas duas abas. "Fora de estoque" (nenhuma vitrine marcada) mantém o produto cadastrado, mas oculto no site.
           </p>
         </Field>
+
 
         <Field label="Descrição curta" full>
           <textarea
