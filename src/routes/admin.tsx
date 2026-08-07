@@ -348,7 +348,7 @@ function AdminPage() {
           const term = searchTerm.trim().toLowerCase();
           const filtered = list.filter((p) => {
             if (filterCategory !== "all" && p.category !== filterCategory) return false;
-            if (filterAvailability !== "all" && (p.availability ?? "catalogo") !== filterAvailability) return false;
+            if (filterAvailability !== "all" && !normalizeAvailabilities(p.availabilities, p.availability).includes(filterAvailability as Availability)) return false;
             if (term && !(`${p.name} ${p.description} ${p.category}`.toLowerCase().includes(term))) return false;
             return true;
           });
