@@ -195,7 +195,8 @@ function AdminPage() {
         image_urls,
         sort_order: d.sort_order,
         additional_info: d.additional_info,
-        availability: d.availability ?? "catalogo",
+        availabilities: normalizeAvailabilities(d.availabilities),
+        availability: normalizeAvailabilities(d.availabilities)[0],
 
       };
       if (d.id) {
