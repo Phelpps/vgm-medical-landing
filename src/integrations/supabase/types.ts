@@ -47,6 +47,7 @@ export type Database = {
       products: {
         Row: {
           additional_info: string
+          availabilities: Database["public"]["Enums"]["product_availability"][]
           availability: Database["public"]["Enums"]["product_availability"]
           category: string
           created_at: string
@@ -60,6 +61,7 @@ export type Database = {
         }
         Insert: {
           additional_info?: string
+          availabilities?: Database["public"]["Enums"]["product_availability"][]
           availability?: Database["public"]["Enums"]["product_availability"]
           category?: string
           created_at?: string
@@ -73,6 +75,7 @@ export type Database = {
         }
         Update: {
           additional_info?: string
+          availabilities?: Database["public"]["Enums"]["product_availability"][]
           availability?: Database["public"]["Enums"]["product_availability"]
           category?: string
           created_at?: string
