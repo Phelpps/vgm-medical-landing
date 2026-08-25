@@ -410,6 +410,9 @@ function AdminPage() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
+                        {p.featured && (
+                          <Star className="h-4 w-4 shrink-0 fill-amber-400 text-amber-500" title="Em destaque na página principal" />
+                        )}
                         <span className="truncate text-sm font-semibold">{p.name}</span>
                         <AvailabilityBadges values={normalizeAvailabilities(p.availabilities, p.availability)} />
                       </div>
@@ -419,7 +422,7 @@ function AdminPage() {
                       </div>
                     </div>
                     <button
-                      onClick={() => setDraft({ ...p, image_urls: p.image_urls ?? [], availabilities: normalizeAvailabilities(p.availabilities, p.availability), file: null, newFiles: [] })}
+                      onClick={() => setDraft({ ...p, image_urls: p.image_urls ?? [], availabilities: normalizeAvailabilities(p.availabilities, p.availability), featured: !!p.featured, file: null, newFiles: [] })}
 
                       className="rounded-md p-2 text-muted-foreground hover:bg-secondary hover:text-foreground"
                       title="Editar"
