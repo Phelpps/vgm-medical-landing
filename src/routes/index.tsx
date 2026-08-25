@@ -50,17 +50,29 @@ type CatalogProduct = {
   image_url: string | null;
   sort_order: number;
   availabilities: string[] | null;
+  featured: boolean | null;
 };
 
 async function fetchCatalogProducts(): Promise<CatalogProduct[]> {
   const { data, error } = await supabase
     .from("products")
-    .select("id, name, description, category, image_url, sort_order, availabilities")
+    .select("id, name, description, category, image_url, sort_order, availabilities, featured")
     .order("category", { ascending: true })
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
   if (error) throw error;
   return (data ?? []) as CatalogProduct[];
+}
+
+const HOME_MAX_ITEMS = 8;
+
+function pickHomeProducts(products: CatalogProduct[], availability: string): CatalogProduct[] {
+  const inGroup = products.filter((p) => (p.availabilities ?? ["catalogo"]).includes(availability));
+  const featured = inGroup.filter((p) => p.featured);
+  const rest = inGroup.filter((p) => !p.featured);
+  const byCategory = new Map<string, CatalogProduct>();
+  for (const p of rest) if (!byCategory.has(p.category)) byCategory.set(p.category, p);
+  return [...featured, ...byCategory.values()].slice(0, HOME_MAX_ITEMS);
 }
 
 function useSignedImage(path: string | null) {
