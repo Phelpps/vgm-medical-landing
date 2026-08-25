@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import heroInstruments from "@/assets/surgical-instruments-hero.jpg.asset.json";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -11,6 +11,8 @@ import {
   ImageOff,
   Wrench,
   Package,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import surgicalImage from "@/assets/surgical-room.jpg";
 import logo from "@/assets/vgm-logo-new.jpeg.asset.json";
@@ -49,12 +51,13 @@ type CatalogProduct = {
   category: string;
   image_url: string | null;
   sort_order: number;
+  availabilities: string[] | null;
 };
 
 async function fetchCatalogProducts(): Promise<CatalogProduct[]> {
   const { data, error } = await supabase
     .from("products")
-    .select("id, name, description, category, image_url, sort_order")
+    .select("id, name, description, category, image_url, sort_order, availabilities")
     .order("category", { ascending: true })
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
@@ -117,6 +120,7 @@ function Index() {
         <Trust />
         <Stats />
         <Catalog />
+        <Rental />
         <Partners />
         <ServiceCTA />
       </main>
@@ -298,11 +302,11 @@ function Stats() {
   );
 }
 
-function CategoryCard({ product }: { product: CatalogProduct }) {
+function CategoryCard({ product, to = "/catalogo" }: { product: CatalogProduct; to?: "/catalogo" | "/locacao" }) {
   const imgUrl = useSignedImage(product.image_url);
   return (
     <Link
-      to="/catalogo"
+      to={to}
       className="group overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] transition hover:-translate-y-1 hover:shadow-[var(--shadow-card)]"
     >
       <div className="relative grid aspect-square place-items-center overflow-hidden bg-secondary/50">
@@ -340,6 +344,8 @@ function Catalog() {
   const firstByCategory = useMemo(() => {
     const seen = new Map<string, CatalogProduct>();
     for (const p of products) {
+      const av = p.availabilities ?? ["catalogo"];
+      if (!av.includes("catalogo")) continue;
       if (!seen.has(p.category)) seen.set(p.category, p);
     }
     return Array.from(seen.values());
@@ -361,7 +367,7 @@ function Catalog() {
       ) : firstByCategory.length === 0 ? (
         <p className="text-center text-muted-foreground">Catálogo em breve.</p>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {firstByCategory.map((p) => (
             <CategoryCard key={p.category} product={p} />
           ))}
@@ -374,6 +380,102 @@ function Catalog() {
         >
           Ver catálogo completo <ArrowRight className="h-4 w-4" />
         </Link>
+      </div>
+    </section>
+  );
+}
+
+function Rental() {
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: fetchCatalogProducts,
+  });
+  const scroller = useRef<HTMLDivElement | null>(null);
+
+  const rentalCategories = useMemo(() => {
+    const seen = new Map<string, CatalogProduct>();
+    for (const p of products) {
+      if (!(p.availabilities ?? []).includes("locacao")) continue;
+      if (!seen.has(p.category)) seen.set(p.category, p);
+    }
+    return Array.from(seen.values());
+  }, [products]);
+
+  const scrollBy = (dir: 1 | -1) => {
+    const el = scroller.current;
+    if (!el) return;
+    const step = el.clientWidth * 0.9;
+    if (dir === 1 && el.scrollLeft + el.clientWidth >= el.scrollWidth - 8) {
+      el.scrollTo({ left: 0, behavior: "smooth" });
+    } else {
+      el.scrollBy({ left: step * dir, behavior: "smooth" });
+    }
+  };
+
+  useEffect(() => {
+    if (rentalCategories.length === 0) return;
+    const id = window.setInterval(() => scrollBy(1), 6000);
+    return () => window.clearInterval(id);
+  }, [rentalCategories.length]);
+
+  if (!isLoading && rentalCategories.length === 0) return null;
+
+  return (
+    <section id="locacao" className="border-y border-border bg-secondary/30 py-20">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div className="max-w-2xl">
+            <span className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Locação</span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+              Equipamentos e instrumentais disponíveis para locação.
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              Flexibilidade para procedimentos pontuais e demandas temporárias, com suporte técnico VGM.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => scrollBy(-1)}
+              aria-label="Anterior"
+              className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card transition hover:bg-secondary"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollBy(1)}
+              aria-label="Próximo"
+              className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card transition hover:bg-secondary"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        {isLoading ? (
+          <p className="text-center text-muted-foreground">Carregando locações…</p>
+        ) : (
+          <div
+            ref={scroller}
+            className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {rentalCategories.map((p) => (
+              <div key={p.category} className="w-[80%] shrink-0 snap-start sm:w-[48%] lg:w-[calc((100%-4.5rem)/4)]">
+                <CategoryCard product={p} to="/locacao" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-8 text-center">
+          <Link
+            to="/locacao"
+            className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] transition hover:opacity-90"
+          >
+            Ver itens para locação <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
     </section>
   );
