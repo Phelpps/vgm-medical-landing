@@ -364,7 +364,7 @@ function Catalog() {
       ) : firstByCategory.length === 0 ? (
         <p className="text-center text-muted-foreground">Catálogo em breve.</p>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {firstByCategory.map((p) => (
             <CategoryCard key={p.category} product={p} />
           ))}
