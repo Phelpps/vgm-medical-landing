@@ -343,6 +343,7 @@ function AdminPage() {
             onSave={() => saveMutation.mutate(draft)}
             saving={saveMutation.isPending}
             error={saveMutation.error?.message}
+            featuredOthers={(products ?? []).filter((x) => x.featured && x.id !== draft.id).length}
           />
         )}
 
@@ -455,6 +456,7 @@ function AdminPage() {
                           onSave={() => saveMutation.mutate(draft)}
                           saving={saveMutation.isPending}
                           error={saveMutation.error?.message}
+                          featuredOthers={(products ?? []).filter((x) => x.featured && x.id !== p.id).length}
                         />
                       </div>
                     )}
