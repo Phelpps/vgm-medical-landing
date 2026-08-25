@@ -357,15 +357,8 @@ function Catalog() {
     queryFn: fetchCatalogProducts,
   });
 
-  const firstByCategory = useMemo(() => {
-    const seen = new Map<string, CatalogProduct>();
-    for (const p of products) {
-      const av = p.availabilities ?? ["catalogo"];
-      if (!av.includes("catalogo")) continue;
-      if (!seen.has(p.category)) seen.set(p.category, p);
-    }
-    return Array.from(seen.values());
-  }, [products]);
+  const highlights = useMemo(() => pickHomeProducts(products, "catalogo"), [products]);
+
 
   return (
     <section id="catalogo" className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
