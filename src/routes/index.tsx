@@ -400,14 +400,7 @@ function Rental() {
     queryFn: fetchCatalogProducts,
   });
 
-  const rentalCategories = useMemo(() => {
-    const seen = new Map<string, CatalogProduct>();
-    for (const p of products) {
-      if (!(p.availabilities ?? []).includes("locacao")) continue;
-      if (!seen.has(p.category)) seen.set(p.category, p);
-    }
-    return Array.from(seen.values());
-  }, [products]);
+  const rentalHighlights = useMemo(() => pickHomeProducts(products, "locacao"), [products]);
 
   return (
     <section id="locacao" className="border-y border-border bg-secondary/30 py-20">
@@ -424,12 +417,12 @@ function Rental() {
 
         {isLoading ? (
           <p className="text-center text-muted-foreground">Carregando locações…</p>
-        ) : rentalCategories.length === 0 ? (
+        ) : rentalHighlights.length === 0 ? (
           <p className="text-center text-muted-foreground">Itens para locação em breve.</p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {rentalCategories.map((p) => (
-              <CategoryCard key={p.category} product={p} to="/locacao" />
+            {rentalHighlights.map((p) => (
+              <CategoryCard key={p.id} product={p} />
             ))}
           </div>
         )}
