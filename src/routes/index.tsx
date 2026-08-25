@@ -11,6 +11,8 @@ import {
   ImageOff,
   Wrench,
   Package,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import surgicalImage from "@/assets/surgical-room.jpg";
 import logo from "@/assets/vgm-logo-new.jpeg.asset.json";
