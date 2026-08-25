@@ -49,12 +49,13 @@ type CatalogProduct = {
   category: string;
   image_url: string | null;
   sort_order: number;
+  availabilities: string[] | null;
 };
 
 async function fetchCatalogProducts(): Promise<CatalogProduct[]> {
   const { data, error } = await supabase
     .from("products")
-    .select("id, name, description, category, image_url, sort_order")
+    .select("id, name, description, category, image_url, sort_order, availabilities")
     .order("category", { ascending: true })
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
