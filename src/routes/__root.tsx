@@ -13,7 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "../lib/cart-context";
 import { FloatingWhatsApp } from "../components/FloatingWhatsApp";
-import faviconAsset from "../assets/vgm-favicon.jpeg.asset.json";
+import faviconAsset from "../assets/vgm-favicon-round.png.asset.json";
 
 
 function NotFoundComponent() {
