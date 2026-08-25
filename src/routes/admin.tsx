@@ -411,7 +411,9 @@ function AdminPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         {p.featured && (
-                          <Star className="h-4 w-4 shrink-0 fill-amber-400 text-amber-500" title="Em destaque na página principal" />
+                          <span title="Em destaque na página principal" className="shrink-0">
+                            <Star className="h-4 w-4 fill-amber-400 text-amber-500" />
+                          </span>
                         )}
                         <span className="truncate text-sm font-semibold">{p.name}</span>
                         <AvailabilityBadges values={normalizeAvailabilities(p.availabilities, p.availability)} />
