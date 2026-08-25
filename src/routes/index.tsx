@@ -11,6 +11,7 @@ import {
   ImageOff,
   Wrench,
   Package,
+  Star,
 } from "lucide-react";
 import surgicalImage from "@/assets/surgical-room.jpg";
 import logo from "@/assets/vgm-logo-new.jpeg.asset.json";
@@ -50,17 +51,29 @@ type CatalogProduct = {
   image_url: string | null;
   sort_order: number;
   availabilities: string[] | null;
+  featured: boolean | null;
 };
 
 async function fetchCatalogProducts(): Promise<CatalogProduct[]> {
   const { data, error } = await supabase
     .from("products")
-    .select("id, name, description, category, image_url, sort_order, availabilities")
+    .select("id, name, description, category, image_url, sort_order, availabilities, featured")
     .order("category", { ascending: true })
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
   if (error) throw error;
   return (data ?? []) as CatalogProduct[];
+}
+
+const HOME_MAX_ITEMS = 8;
+
+function pickHomeProducts(products: CatalogProduct[], availability: string): CatalogProduct[] {
+  const inGroup = products.filter((p) => (p.availabilities ?? ["catalogo"]).includes(availability));
+  const featured = inGroup.filter((p) => p.featured);
+  const rest = inGroup.filter((p) => !p.featured);
+  const byCategory = new Map<string, CatalogProduct>();
+  for (const p of rest) if (!byCategory.has(p.category)) byCategory.set(p.category, p);
+  return [...featured, ...byCategory.values()].slice(0, HOME_MAX_ITEMS);
 }
 
 function useSignedImage(path: string | null) {
@@ -300,17 +313,23 @@ function Stats() {
   );
 }
 
-function CategoryCard({ product, to = "/catalogo" }: { product: CatalogProduct; to?: "/catalogo" | "/locacao" }) {
+function CategoryCard({ product }: { product: CatalogProduct }) {
   const imgUrl = useSignedImage(product.image_url);
   return (
     <Link
-      to={to}
+      to="/produto/$id"
+      params={{ id: product.id }}
       className="group overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] transition hover:-translate-y-1 hover:shadow-[var(--shadow-card)]"
     >
       <div className="relative grid aspect-square place-items-center overflow-hidden bg-secondary/50">
+        {product.featured && (
+          <span className="absolute right-3 top-3 z-10 grid h-8 w-8 place-items-center rounded-full bg-white/90 shadow-[var(--shadow-soft)]">
+            <Star className="h-4 w-4 fill-amber-400 text-amber-500" />
+          </span>
+        )}
         {product.image_url ? (
           imgUrl ? (
-            <img src={imgUrl} alt={product.category} loading="lazy"
+            <img src={imgUrl} alt={product.name} loading="lazy"
               className="h-full w-full object-contain p-6 transition duration-500 group-hover:scale-105" />
           ) : (
             <div className="text-xs text-muted-foreground">Carregando…</div>
@@ -326,7 +345,7 @@ function CategoryCard({ product, to = "/catalogo" }: { product: CatalogProduct; 
           <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
         )}
         <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-all group-hover:gap-2.5">
-          Ver categoria <ArrowRight className="h-4 w-4" />
+          Ver produto <ArrowRight className="h-4 w-4" />
         </span>
       </div>
     </Link>
@@ -339,15 +358,8 @@ function Catalog() {
     queryFn: fetchCatalogProducts,
   });
 
-  const firstByCategory = useMemo(() => {
-    const seen = new Map<string, CatalogProduct>();
-    for (const p of products) {
-      const av = p.availabilities ?? ["catalogo"];
-      if (!av.includes("catalogo")) continue;
-      if (!seen.has(p.category)) seen.set(p.category, p);
-    }
-    return Array.from(seen.values());
-  }, [products]);
+  const highlights = useMemo(() => pickHomeProducts(products, "catalogo"), [products]);
+
 
   return (
     <section id="catalogo" className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
@@ -361,13 +373,13 @@ function Catalog() {
         </p>
       </div>
       {isLoading ? (
-        <p className="text-center text-muted-foreground">Carregando categorias…</p>
-      ) : firstByCategory.length === 0 ? (
+        <p className="text-center text-muted-foreground">Carregando produtos…</p>
+      ) : highlights.length === 0 ? (
         <p className="text-center text-muted-foreground">Catálogo em breve.</p>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {firstByCategory.map((p) => (
-            <CategoryCard key={p.category} product={p} />
+          {highlights.map((p) => (
+            <CategoryCard key={p.id} product={p} />
           ))}
         </div>
       )}
@@ -389,14 +401,7 @@ function Rental() {
     queryFn: fetchCatalogProducts,
   });
 
-  const rentalCategories = useMemo(() => {
-    const seen = new Map<string, CatalogProduct>();
-    for (const p of products) {
-      if (!(p.availabilities ?? []).includes("locacao")) continue;
-      if (!seen.has(p.category)) seen.set(p.category, p);
-    }
-    return Array.from(seen.values());
-  }, [products]);
+  const rentalHighlights = useMemo(() => pickHomeProducts(products, "locacao"), [products]);
 
   return (
     <section id="locacao" className="border-y border-border bg-secondary/30 py-20">
@@ -413,12 +418,12 @@ function Rental() {
 
         {isLoading ? (
           <p className="text-center text-muted-foreground">Carregando locações…</p>
-        ) : rentalCategories.length === 0 ? (
+        ) : rentalHighlights.length === 0 ? (
           <p className="text-center text-muted-foreground">Itens para locação em breve.</p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {rentalCategories.map((p) => (
-              <CategoryCard key={p.category} product={p} to="/locacao" />
+            {rentalHighlights.map((p) => (
+              <CategoryCard key={p.id} product={p} />
             ))}
           </div>
         )}

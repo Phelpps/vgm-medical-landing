@@ -52,6 +52,7 @@ export type Database = {
           category: string
           created_at: string
           description: string
+          featured: boolean
           id: string
           image_url: string | null
           image_urls: string[]
@@ -66,6 +67,7 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string
+          featured?: boolean
           id?: string
           image_url?: string | null
           image_urls?: string[]
@@ -80,6 +82,7 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string
+          featured?: boolean
           id?: string
           image_url?: string | null
           image_urls?: string[]

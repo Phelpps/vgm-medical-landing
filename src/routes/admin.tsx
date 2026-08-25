@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, LogOut, Plus, Pencil, Trash2, Save, X, Upload, ImageOff, UserPlus, KeyRound, Mail, Image as ImageIcon, Building2 } from "lucide-react";
+import { ArrowLeft, LogOut, Plus, Pencil, Trash2, Save, X, Upload, ImageOff, UserPlus, KeyRound, Mail, Image as ImageIcon, Building2, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { createAdminUser } from "@/lib/admin-users.functions";
 
@@ -67,6 +67,7 @@ type Product = {
   additional_info: string;
   availability: Availability;
   availabilities: Availability[];
+  featured: boolean;
 };
 
 type Draft = {
@@ -79,11 +80,12 @@ type Draft = {
   sort_order: number;
   additional_info: string;
   availabilities: Availability[];
+  featured: boolean;
   file?: File | null;
   newFiles?: File[];
 };
 
-const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, image_urls: [], sort_order: 0, additional_info: "", availabilities: ["catalogo"], file: null, newFiles: [] };
+const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, image_urls: [], sort_order: 0, additional_info: "", availabilities: ["catalogo"], featured: false, file: null, newFiles: [] };
 
 
 function AdminPage() {
@@ -197,6 +199,8 @@ function AdminPage() {
         additional_info: d.additional_info,
         availabilities: normalizeAvailabilities(d.availabilities),
         availability: normalizeAvailabilities(d.availabilities)[0],
+        featured: !!d.featured,
+
 
       };
       if (d.id) {
@@ -406,6 +410,11 @@ function AdminPage() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
+                        {p.featured && (
+                          <span title="Em destaque na página principal" className="shrink-0">
+                            <Star className="h-4 w-4 fill-amber-400 text-amber-500" />
+                          </span>
+                        )}
                         <span className="truncate text-sm font-semibold">{p.name}</span>
                         <AvailabilityBadges values={normalizeAvailabilities(p.availabilities, p.availability)} />
                       </div>
@@ -415,7 +424,7 @@ function AdminPage() {
                       </div>
                     </div>
                     <button
-                      onClick={() => setDraft({ ...p, image_urls: p.image_urls ?? [], availabilities: normalizeAvailabilities(p.availabilities, p.availability), file: null, newFiles: [] })}
+                      onClick={() => setDraft({ ...p, image_urls: p.image_urls ?? [], availabilities: normalizeAvailabilities(p.availabilities, p.availability), featured: !!p.featured, file: null, newFiles: [] })}
 
                       className="rounded-md p-2 text-muted-foreground hover:bg-secondary hover:text-foreground"
                       title="Editar"
@@ -536,9 +545,26 @@ function ProductForm({
               />
               Fora de estoque
             </label>
+            <label
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                draft.featured
+                  ? "border-amber-400/50 bg-amber-400/15 text-amber-700"
+                  : "border-border bg-background text-muted-foreground hover:bg-secondary"
+              }`}
+            >
+              <input
+                type="checkbox"
+                className="accent-current"
+                checked={!!draft.featured}
+                onChange={() => onChange({ ...draft, featured: !draft.featured })}
+              />
+              <Star className={`h-4 w-4 ${draft.featured ? "fill-amber-400 text-amber-500" : ""}`} />
+              Página Principal
+            </label>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             Marque Catálogo e Locação juntos para exibir o produto nas duas abas. "Fora de estoque" (nenhuma vitrine marcada) mantém o produto cadastrado, mas oculto no site.
+            "Página Principal" destaca o produto na home (estrela dourada).
           </p>
         </Field>
 
