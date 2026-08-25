@@ -335,7 +335,7 @@ function AdminPage() {
             }}
           />
         )}
-        {draft && (
+        {draft && !draft.id && (
           <ProductForm
             draft={draft}
             onChange={setDraft}
@@ -345,6 +345,7 @@ function AdminPage() {
             error={saveMutation.error?.message}
           />
         )}
+
 
         {(() => {
           const list = products ?? [];
