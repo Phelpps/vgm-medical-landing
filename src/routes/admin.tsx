@@ -199,6 +199,8 @@ function AdminPage() {
         additional_info: d.additional_info,
         availabilities: normalizeAvailabilities(d.availabilities),
         availability: normalizeAvailabilities(d.availabilities)[0],
+        featured: !!d.featured,
+
 
       };
       if (d.id) {
