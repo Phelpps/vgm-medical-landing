@@ -125,37 +125,29 @@ function CartPage() {
         ) : (
           <>
             <div className="space-y-8">
-              <section>
-                <div className="mb-3 flex items-center gap-2">
-                  <h2 className="text-sm font-bold uppercase tracking-[0.18em] text-primary">Catálogo</h2>
-                  <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
-                    {catalogItems.reduce((s, it) => s + it.quantity, 0)}
-                  </span>
-                </div>
-                {catalogItems.length > 0 ? (
-                  renderList(catalogItems)
-                ) : (
-                  <p className="rounded-2xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
-                    Nenhum produto de catálogo adicionado.
-                  </p>
-                )}
-              </section>
+              {catalogItems.length > 0 && (
+                <section>
+                  <div className="mb-3 flex items-center gap-2">
+                    <h2 className="text-sm font-bold uppercase tracking-[0.18em] text-primary">Catálogo</h2>
+                    <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                      {catalogItems.reduce((s, it) => s + it.quantity, 0)}
+                    </span>
+                  </div>
+                  {renderList(catalogItems)}
+                </section>
+              )}
 
-              <section>
-                <div className="mb-3 flex items-center gap-2">
-                  <h2 className="text-sm font-bold uppercase tracking-[0.18em] text-amber-700">Locação</h2>
-                  <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-700">
-                    {rentalItems.reduce((s, it) => s + it.quantity, 0)}
-                  </span>
-                </div>
-                {rentalItems.length > 0 ? (
-                  renderList(rentalItems)
-                ) : (
-                  <p className="rounded-2xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
-                    Nenhum item de locação adicionado.
-                  </p>
-                )}
-              </section>
+              {rentalItems.length > 0 && (
+                <section>
+                  <div className="mb-3 flex items-center gap-2">
+                    <h2 className="text-sm font-bold uppercase tracking-[0.18em] text-amber-700">Locação</h2>
+                    <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-700">
+                      {rentalItems.reduce((s, it) => s + it.quantity, 0)}
+                    </span>
+                  </div>
+                  {renderList(rentalItems)}
+                </section>
+              )}
             </div>
 
             <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
