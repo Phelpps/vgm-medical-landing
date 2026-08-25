@@ -545,9 +545,26 @@ function ProductForm({
               />
               Fora de estoque
             </label>
+            <label
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                draft.featured
+                  ? "border-amber-400/50 bg-amber-400/15 text-amber-700"
+                  : "border-border bg-background text-muted-foreground hover:bg-secondary"
+              }`}
+            >
+              <input
+                type="checkbox"
+                className="accent-current"
+                checked={!!draft.featured}
+                onChange={() => onChange({ ...draft, featured: !draft.featured })}
+              />
+              <Star className={`h-4 w-4 ${draft.featured ? "fill-amber-400 text-amber-500" : ""}`} />
+              Página Principal
+            </label>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             Marque Catálogo e Locação juntos para exibir o produto nas duas abas. "Fora de estoque" (nenhuma vitrine marcada) mantém o produto cadastrado, mas oculto no site.
+            "Página Principal" destaca o produto na home (estrela dourada).
           </p>
         </Field>
 
