@@ -299,11 +299,11 @@ function Stats() {
   );
 }
 
-function CategoryCard({ product }: { product: CatalogProduct }) {
+function CategoryCard({ product, to = "/catalogo" }: { product: CatalogProduct; to?: "/catalogo" | "/locacao" }) {
   const imgUrl = useSignedImage(product.image_url);
   return (
     <Link
-      to="/catalogo"
+      to={to}
       className="group overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] transition hover:-translate-y-1 hover:shadow-[var(--shadow-card)]"
     >
       <div className="relative grid aspect-square place-items-center overflow-hidden bg-secondary/50">
