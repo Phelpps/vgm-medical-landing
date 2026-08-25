@@ -11,6 +11,7 @@ import {
   ImageOff,
   Wrench,
   Package,
+  Star,
 } from "lucide-react";
 import surgicalImage from "@/assets/surgical-room.jpg";
 import logo from "@/assets/vgm-logo-new.jpeg.asset.json";
