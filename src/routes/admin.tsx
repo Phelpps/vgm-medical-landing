@@ -470,6 +470,8 @@ function AdminPage() {
   );
 }
 
+const FEATURED_LIMIT = 8;
+
 function ProductForm({
   draft,
   onChange,
@@ -477,6 +479,7 @@ function ProductForm({
   onSave,
   saving,
   error,
+  featuredOthers,
 }: {
   draft: Draft;
   onChange: (d: Draft) => void;
@@ -484,8 +487,10 @@ function ProductForm({
   onSave: () => void;
   saving: boolean;
   error?: string;
+  featuredOthers: number;
 }) {
   const [preview, setPreview] = useState<string | null>(null);
+  const [featuredWarning, setFeaturedWarning] = useState<string | null>(null);
   useEffect(() => {
     if (!draft.file) {
       setPreview(null);
@@ -495,6 +500,7 @@ function ProductForm({
     setPreview(url);
     return () => URL.revokeObjectURL(url);
   }, [draft.file]);
+
 
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
