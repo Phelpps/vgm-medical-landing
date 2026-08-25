@@ -341,6 +341,8 @@ function Catalog() {
   const firstByCategory = useMemo(() => {
     const seen = new Map<string, CatalogProduct>();
     for (const p of products) {
+      const av = p.availabilities ?? ["catalogo"];
+      if (!av.includes("catalogo")) continue;
       if (!seen.has(p.category)) seen.set(p.category, p);
     }
     return Array.from(seen.values());
