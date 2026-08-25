@@ -67,6 +67,7 @@ type Product = {
   additional_info: string;
   availability: Availability;
   availabilities: Availability[];
+  featured: boolean;
 };
 
 type Draft = {
@@ -79,11 +80,12 @@ type Draft = {
   sort_order: number;
   additional_info: string;
   availabilities: Availability[];
+  featured: boolean;
   file?: File | null;
   newFiles?: File[];
 };
 
-const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, image_urls: [], sort_order: 0, additional_info: "", availabilities: ["catalogo"], file: null, newFiles: [] };
+const EMPTY: Draft = { name: "", description: "", category: "", image_url: null, image_urls: [], sort_order: 0, additional_info: "", availabilities: ["catalogo"], featured: false, file: null, newFiles: [] };
 
 
 function AdminPage() {
