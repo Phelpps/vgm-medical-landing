@@ -372,13 +372,13 @@ function Catalog() {
         </p>
       </div>
       {isLoading ? (
-        <p className="text-center text-muted-foreground">Carregando categorias…</p>
-      ) : firstByCategory.length === 0 ? (
+        <p className="text-center text-muted-foreground">Carregando produtos…</p>
+      ) : highlights.length === 0 ? (
         <p className="text-center text-muted-foreground">Catálogo em breve.</p>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {firstByCategory.map((p) => (
-            <CategoryCard key={p.category} product={p} />
+          {highlights.map((p) => (
+            <CategoryCard key={p.id} product={p} />
           ))}
         </div>
       )}
