@@ -335,7 +335,7 @@ function AdminPage() {
             }}
           />
         )}
-        {draft && (
+        {draft && !draft.id && (
           <ProductForm
             draft={draft}
             onChange={setDraft}
@@ -345,6 +345,7 @@ function AdminPage() {
             error={saveMutation.error?.message}
           />
         )}
+
 
         {(() => {
           const list = products ?? [];
@@ -400,7 +401,8 @@ function AdminPage() {
                   </li>
                 )}
                 {filtered.map((p) => (
-                  <li key={p.id} className="flex items-center gap-4 px-4 py-3">
+                  <li key={p.id}>
+                    <div className="flex items-center gap-4 px-4 py-3">
                     <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-white">
                       {p.image_url && signedThumbs[p.image_url] ? (
                         <img src={signedThumbs[p.image_url]} alt="" className="h-full w-full object-contain" />
@@ -424,9 +426,12 @@ function AdminPage() {
                       </div>
                     </div>
                     <button
-                      onClick={() => setDraft({ ...p, image_urls: p.image_urls ?? [], availabilities: normalizeAvailabilities(p.availabilities, p.availability), featured: !!p.featured, file: null, newFiles: [] })}
-
-                      className="rounded-md p-2 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                      onClick={() =>
+                        draft?.id === p.id
+                          ? setDraft(null)
+                          : setDraft({ ...p, image_urls: p.image_urls ?? [], availabilities: normalizeAvailabilities(p.availabilities, p.availability), featured: !!p.featured, file: null, newFiles: [] })
+                      }
+                      className={`rounded-md p-2 transition ${draft?.id === p.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground"}`}
                       title="Editar"
                     >
                       <Pencil className="h-4 w-4" />
@@ -440,8 +445,22 @@ function AdminPage() {
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
+                    </div>
+                    {draft?.id === p.id && (
+                      <div className="border-t border-border bg-secondary/30 px-4 py-4">
+                        <ProductForm
+                          draft={draft}
+                          onChange={setDraft}
+                          onCancel={() => setDraft(null)}
+                          onSave={() => saveMutation.mutate(draft)}
+                          saving={saveMutation.isPending}
+                          error={saveMutation.error?.message}
+                        />
+                      </div>
+                    )}
                   </li>
                 ))}
+
               </ul>
             </>
           );
