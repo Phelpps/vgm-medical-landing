@@ -322,11 +322,6 @@ function CategoryCard({ product }: { product: CatalogProduct }) {
       className="group overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] transition hover:-translate-y-1 hover:shadow-[var(--shadow-card)]"
     >
       <div className="relative grid aspect-square place-items-center overflow-hidden bg-secondary/50">
-        {product.featured && (
-          <span className="absolute right-3 top-3 z-10 grid h-8 w-8 place-items-center rounded-full bg-white/90 shadow-[var(--shadow-soft)]">
-            <Star className="h-4 w-4 fill-amber-400 text-amber-500" />
-          </span>
-        )}
         {product.image_url ? (
           imgUrl ? (
             <img src={imgUrl} alt={product.name} loading="lazy"
