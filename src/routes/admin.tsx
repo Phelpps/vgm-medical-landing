@@ -575,7 +575,16 @@ function ProductForm({
                 type="checkbox"
                 className="accent-current"
                 checked={!!draft.featured}
-                onChange={() => onChange({ ...draft, featured: !draft.featured })}
+                onChange={() => {
+                  if (!draft.featured && featuredOthers >= FEATURED_LIMIT) {
+                    setFeaturedWarning(
+                      `Limite de ${FEATURED_LIMIT} produtos na Página Principal atingido. Desmarque "Página Principal" de outro produto antes de destacar este.`,
+                    );
+                    return;
+                  }
+                  setFeaturedWarning(null);
+                  onChange({ ...draft, featured: !draft.featured });
+                }}
               />
               <Star className={`h-4 w-4 ${draft.featured ? "fill-amber-400 text-amber-500" : ""}`} />
               Página Principal
@@ -583,8 +592,14 @@ function ProductForm({
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             Marque Catálogo e Locação juntos para exibir o produto nas duas abas. "Fora de estoque" (nenhuma vitrine marcada) mantém o produto cadastrado, mas oculto no site.
-            "Página Principal" destaca o produto na home (estrela dourada).
+            "Página Principal" destaca o produto na home (estrela dourada) — máximo de {FEATURED_LIMIT} produtos ({featuredOthers + (draft.featured ? 1 : 0)}/{FEATURED_LIMIT} usados).
           </p>
+          {featuredWarning && (
+            <p className="mt-2 rounded-lg border border-amber-400/50 bg-amber-400/10 px-3 py-2 text-xs font-semibold text-amber-700">
+              {featuredWarning}
+            </p>
+          )}
+
         </Field>
 
 
