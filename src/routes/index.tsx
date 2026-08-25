@@ -120,6 +120,7 @@ function Index() {
         <Trust />
         <Stats />
         <Catalog />
+        <Rental />
         <Partners />
         <ServiceCTA />
       </main>
