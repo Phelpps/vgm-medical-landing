@@ -207,7 +207,7 @@ function Hero() {
           <div className="max-w-3xl">
             <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
               Equipamentos e instrumentais para{" "}
-              <span className="bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">videocirurgia</span> e linha convencional.
+              <span className="bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">videocirurgia</span> e linha convencional
             </h1>
             <p className="mt-5 max-w-2xl text-base text-white/90 sm:text-lg">
               A VGM Medical fornece equipamentos e instrumentais cirúrgicos para hospitais, clínicas e profissionais da saúde, marcas reconhecidas e assistência técnica especializada.
@@ -360,7 +360,7 @@ function Catalog() {
       <div className="mb-12 max-w-2xl">
         <span className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Catálogo</span>
         <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Soluções integradas em videocirurgia e instrumentais convencionais.
+          Soluções integradas em videocirurgia e instrumentais convencionais
         </h2>
         <p className="mt-3 text-muted-foreground">
           Conheça nossas especialidades. Acesse o catálogo completo para ver todos os produtos.
@@ -403,7 +403,7 @@ function Rental() {
         <div className="mb-12 max-w-2xl">
           <span className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Locação</span>
           <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Equipamentos e instrumentais disponíveis para locação.
+            Equipamentos e instrumentais disponíveis para locação
           </h2>
           <p className="mt-3 text-muted-foreground">
             Flexibilidade para atender demandas temporárias com suporte técnico especializado.
