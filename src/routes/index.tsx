@@ -406,7 +406,7 @@ function Rental() {
             Equipamentos e instrumentais disponíveis para locação.
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Flexibilidade para procedimentos pontuais e demandas temporárias, com suporte técnico VGM.
+            Flexibilidade para atender demandas temporárias com suporte técnico especializado.
           </p>
         </div>
 
